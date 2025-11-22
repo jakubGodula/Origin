@@ -1,9 +1,10 @@
 [package]
 name = "Origin"
-edition = "2024.beta" # edition = "legacy" to use legacy (pre-2024) Move
+edition = "2024" # edition = "legacy" to use legacy (pre-2024) Move
+version = "0.0.1"
 license = "MIT OR Apache-2.0"
 authors = ["Jakub Godula <originwallet@proton.me>"]
-repository = "https://github.com/jakubGodula/Origin"
+published-at = "https://github.com/jakubGodula/Origin"
 
 [dependencies]
 
