@@ -1,7 +1,7 @@
 "use client";
 
 import React from 'react';
-import { Button } from './Button';
+
 import Link from 'next/link';
 import { ConnectButton } from '@mysten/dapp-kit';
 

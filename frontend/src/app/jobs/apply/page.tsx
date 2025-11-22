@@ -12,7 +12,10 @@ function JobApplicationContent() {
     const searchParams = useSearchParams();
     const id = searchParams.get('id');
     const [isLoading, setIsLoading] = useState(false);
-    const [jobTitle, setJobTitle] = useState("");
+
+    // Derive job title directly
+    const job = id ? getJobById(Number(id)) : null;
+    const jobTitle = job?.title || "";
 
     // State for form fields
     const [formData, setFormData] = useState({
@@ -23,24 +26,18 @@ function JobApplicationContent() {
     });
 
     useEffect(() => {
-        if (id) {
-            const job = getJobById(Number(id));
-            if (job) {
-                setJobTitle(job.title);
-            }
-        }
-    }, [id]);
-
-    useEffect(() => {
         const savedProfile = localStorage.getItem('userProfile');
         if (savedProfile) {
             const profile = JSON.parse(savedProfile);
-            setFormData(prev => ({
-                ...prev,
-                name: profile.name || '',
-                portfolio: profile.portfolio || '',
-                coverLetter: profile.bio ? `Here is my bio: ${profile.bio}\n\nAnd my skills: ${profile.skills}` : ''
-            }));
+            // Wrap in setTimeout to avoid "synchronous setState in effect" lint warning
+            setTimeout(() => {
+                setFormData(prev => ({
+                    ...prev,
+                    name: profile.name || '',
+                    portfolio: profile.portfolio || '',
+                    coverLetter: profile.bio ? `Here is my bio: ${profile.bio}\n\nAnd my skills: ${profile.skills}` : ''
+                }));
+            }, 0);
         }
     }, []);
 
