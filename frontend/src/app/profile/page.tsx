@@ -7,6 +7,7 @@ import { Button } from '@/components/Button';
 export default function ProfilePage() {
     const [isLoading, setIsLoading] = useState(false);
     const [formData, setFormData] = useState({
+        role: 'candidate' as 'candidate' | 'employer',
         name: '',
         bio: '',
         portfolio: '',
@@ -33,7 +34,10 @@ export default function ProfilePage() {
         if (savedProfile) {
             // Wrap in setTimeout to avoid "synchronous setState in effect" lint warning
             setTimeout(() => {
-                setFormData(JSON.parse(savedProfile));
+                const parsed = JSON.parse(savedProfile);
+                // Ensure role exists for backward compatibility
+                if (!parsed.role) parsed.role = 'candidate';
+                setFormData(parsed);
             }, 0);
         }
     }, []);
@@ -45,6 +49,10 @@ export default function ProfilePage() {
 
     const handleToggle = (field: 'locationPrivate' | 'nationalityPrivate' | 'emergencyRateEnabled' | 'minimalEngagementTimeEnabled') => {
         setFormData(prev => ({ ...prev, [field]: !prev[field] }));
+    };
+
+    const handleRoleChange = (role: 'candidate' | 'employer') => {
+        setFormData(prev => ({ ...prev, role }));
     };
 
     const handleAddSkill = (e: React.KeyboardEvent) => {
@@ -119,9 +127,33 @@ export default function ProfilePage() {
                 <div className="container mx-auto max-w-2xl">
                     <div className="bg-white/5 border border-white/10 rounded-2xl p-8 md:p-12 backdrop-blur-sm">
                         <h1 className="text-3xl font-bold text-white mb-2">Your Profile</h1>
-                        <p className="text-zinc-400 mb-8">Manage your candidate profile. This information will be used to autofill job applications.</p>
+                        <p className="text-zinc-400 mb-8">Manage your {formData.role} profile. This information will be used to autofill {formData.role === 'candidate' ? 'job applications' : 'job postings'}.</p>
 
                         <form onSubmit={handleSubmit} className="space-y-6">
+                            {/* Role Selection */}
+                            <div className="flex p-1 bg-black/20 rounded-lg border border-white/10 mb-8">
+                                <button
+                                    type="button"
+                                    onClick={() => handleRoleChange('candidate')}
+                                    className={`flex-1 py-2 text-sm font-medium rounded-md transition-all ${formData.role === 'candidate'
+                                            ? 'bg-primary text-white shadow-lg'
+                                            : 'text-zinc-400 hover:text-white'
+                                        }`}
+                                >
+                                    Candidate
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => handleRoleChange('employer')}
+                                    className={`flex-1 py-2 text-sm font-medium rounded-md transition-all ${formData.role === 'employer'
+                                            ? 'bg-primary text-white shadow-lg'
+                                            : 'text-zinc-400 hover:text-white'
+                                        }`}
+                                >
+                                    Employer
+                                </button>
+                            </div>
+
                             {/* Profile Picture Placeholder */}
                             <div className="flex items-center gap-6 mb-8">
                                 <div className="w-24 h-24 rounded-full bg-white/10 border border-white/20 flex items-center justify-center overflow-hidden relative">
@@ -129,12 +161,14 @@ export default function ProfilePage() {
                                         // eslint-disable-next-line @next/next/no-img-element
                                         <img src={formData.pictureUrl} alt="Profile" className="w-full h-full object-cover" />
                                     ) : (
-                                        <span className="text-4xl text-zinc-600">👤</span>
+                                        <span className="text-4xl text-zinc-600">
+                                            {formData.role === 'candidate' ? '👤' : '🏢'}
+                                        </span>
                                     )}
                                 </div>
                                 <div className="flex-1">
                                     <label htmlFor="pictureUrl" className="block text-sm font-medium text-zinc-300 mb-2">
-                                        Profile Picture URL
+                                        {formData.role === 'candidate' ? 'Profile Picture URL' : 'Company Logo URL'}
                                     </label>
                                     <input
                                         type="url"
@@ -143,14 +177,14 @@ export default function ProfilePage() {
                                         value={formData.pictureUrl}
                                         onChange={handleChange}
                                         className="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-3 text-white placeholder:text-zinc-600 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all"
-                                        placeholder="https://example.com/avatar.jpg"
+                                        placeholder="https://example.com/image.jpg"
                                     />
                                 </div>
                             </div>
 
                             <div>
                                 <label htmlFor="name" className="block text-sm font-medium text-zinc-300 mb-2">
-                                    Full Name
+                                    {formData.role === 'candidate' ? 'Full Name' : 'Company Name'}
                                 </label>
                                 <input
                                     type="text"
@@ -160,13 +194,13 @@ export default function ProfilePage() {
                                     onChange={handleChange}
                                     required
                                     className="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-3 text-white placeholder:text-zinc-600 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all"
-                                    placeholder="John Doe"
+                                    placeholder={formData.role === 'candidate' ? "John Doe" : "Acme Corp"}
                                 />
                             </div>
 
                             <div>
                                 <label htmlFor="bio" className="block text-sm font-medium text-zinc-300 mb-2">
-                                    Bio
+                                    {formData.role === 'candidate' ? 'Bio' : 'Company Description'}
                                 </label>
                                 <textarea
                                     id="bio"
@@ -175,7 +209,7 @@ export default function ProfilePage() {
                                     onChange={handleChange}
                                     rows={4}
                                     className="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-3 text-white placeholder:text-zinc-600 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all resize-none"
-                                    placeholder="Brief introduction about yourself..."
+                                    placeholder={formData.role === 'candidate' ? "Brief introduction about yourself..." : "Tell us about your company..."}
                                 />
                             </div>
 
@@ -183,7 +217,7 @@ export default function ProfilePage() {
                                 <div>
                                     <div className="flex items-center justify-between mb-2">
                                         <label htmlFor="location" className="block text-sm font-medium text-zinc-300">
-                                            Location
+                                            {formData.role === 'candidate' ? 'Location' : 'Headquarters'}
                                         </label>
                                         <div className="flex items-center gap-2">
                                             <span className="text-xs text-zinc-500">Private</span>
@@ -209,7 +243,7 @@ export default function ProfilePage() {
                                 <div>
                                     <div className="flex items-center justify-between mb-2">
                                         <label htmlFor="nationality" className="block text-sm font-medium text-zinc-300">
-                                            Nationality
+                                            {formData.role === 'candidate' ? 'Nationality' : 'Origin'}
                                         </label>
                                         <div className="flex items-center gap-2">
                                             <span className="text-xs text-zinc-500">Private</span>
@@ -229,7 +263,7 @@ export default function ProfilePage() {
                                         value={formData.nationality}
                                         onChange={handleChange}
                                         className="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-3 text-white placeholder:text-zinc-600 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all"
-                                        placeholder="Nationality"
+                                        placeholder={formData.role === 'candidate' ? "Nationality" : "Country of Origin"}
                                     />
                                 </div>
                             </div>
@@ -259,78 +293,83 @@ export default function ProfilePage() {
                                 </select>
                             </div>
 
-                            <div>
-                                <label htmlFor="hourlyRate" className="block text-sm font-medium text-zinc-300 mb-2">
-                                    Hourly Rate (Required)
-                                </label>
-                                <input
-                                    type="number"
-                                    id="hourlyRate"
-                                    name="hourlyRate"
-                                    value={formData.hourlyRate}
-                                    onChange={handleChange}
-                                    required
-                                    min="0"
-                                    className="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-3 text-white placeholder:text-zinc-600 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all"
-                                    placeholder="e.g. 50"
-                                />
-                            </div>
+                            {/* Candidate Specific Fields */}
+                            {formData.role === 'candidate' && (
+                                <>
+                                    <div>
+                                        <label htmlFor="hourlyRate" className="block text-sm font-medium text-zinc-300 mb-2">
+                                            Hourly Rate (Required)
+                                        </label>
+                                        <input
+                                            type="number"
+                                            id="hourlyRate"
+                                            name="hourlyRate"
+                                            value={formData.hourlyRate}
+                                            onChange={handleChange}
+                                            required={formData.role === 'candidate'}
+                                            min="0"
+                                            className="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-3 text-white placeholder:text-zinc-600 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all"
+                                            placeholder="e.g. 50"
+                                        />
+                                    </div>
 
-                            <div>
-                                <div className="flex items-center justify-between mb-2">
-                                    <label htmlFor="emergencyRate" className="block text-sm font-medium text-zinc-300">
-                                        Emergency Rate
-                                    </label>
-                                    <button
-                                        type="button"
-                                        onClick={() => handleToggle('emergencyRateEnabled')}
-                                        className={`w-8 h-4 rounded-full transition-colors relative ${formData.emergencyRateEnabled ? 'bg-primary' : 'bg-zinc-600'}`}
-                                    >
-                                        <div className={`absolute top-0.5 left-0.5 w-3 h-3 rounded-full bg-white transition-transform ${formData.emergencyRateEnabled ? 'translate-x-4' : 'translate-x-0'}`} />
-                                    </button>
-                                </div>
-                                {formData.emergencyRateEnabled && (
-                                    <input
-                                        type="number"
-                                        id="emergencyRate"
-                                        name="emergencyRate"
-                                        value={formData.emergencyRate}
-                                        onChange={handleChange}
-                                        required={formData.emergencyRateEnabled}
-                                        min="0"
-                                        className="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-3 text-white placeholder:text-zinc-600 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all"
-                                        placeholder="e.g. 100"
-                                    />
-                                )}
-                            </div>
+                                    <div>
+                                        <div className="flex items-center justify-between mb-2">
+                                            <label htmlFor="emergencyRate" className="block text-sm font-medium text-zinc-300">
+                                                Emergency Rate
+                                            </label>
+                                            <button
+                                                type="button"
+                                                onClick={() => handleToggle('emergencyRateEnabled')}
+                                                className={`w-8 h-4 rounded-full transition-colors relative ${formData.emergencyRateEnabled ? 'bg-primary' : 'bg-zinc-600'}`}
+                                            >
+                                                <div className={`absolute top-0.5 left-0.5 w-3 h-3 rounded-full bg-white transition-transform ${formData.emergencyRateEnabled ? 'translate-x-4' : 'translate-x-0'}`} />
+                                            </button>
+                                        </div>
+                                        {formData.emergencyRateEnabled && (
+                                            <input
+                                                type="number"
+                                                id="emergencyRate"
+                                                name="emergencyRate"
+                                                value={formData.emergencyRate}
+                                                onChange={handleChange}
+                                                required={formData.emergencyRateEnabled}
+                                                min="0"
+                                                className="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-3 text-white placeholder:text-zinc-600 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all"
+                                                placeholder="e.g. 100"
+                                            />
+                                        )}
+                                    </div>
 
-                            <div>
-                                <div className="flex items-center justify-between mb-2">
-                                    <label htmlFor="minimalEngagementTime" className="block text-sm font-medium text-zinc-300">
-                                        Minimal Engagement Time (Hours)
-                                    </label>
-                                    <button
-                                        type="button"
-                                        onClick={() => handleToggle('minimalEngagementTimeEnabled')}
-                                        className={`w-8 h-4 rounded-full transition-colors relative ${formData.minimalEngagementTimeEnabled ? 'bg-primary' : 'bg-zinc-600'}`}
-                                    >
-                                        <div className={`absolute top-0.5 left-0.5 w-3 h-3 rounded-full bg-white transition-transform ${formData.minimalEngagementTimeEnabled ? 'translate-x-4' : 'translate-x-0'}`} />
-                                    </button>
-                                </div>
-                                {formData.minimalEngagementTimeEnabled && (
-                                    <input
-                                        type="number"
-                                        id="minimalEngagementTime"
-                                        name="minimalEngagementTime"
-                                        value={formData.minimalEngagementTime}
-                                        onChange={handleChange}
-                                        required={formData.minimalEngagementTimeEnabled}
-                                        min="0"
-                                        className="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-3 text-white placeholder:text-zinc-600 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all"
-                                        placeholder="e.g. 4"
-                                    />
-                                )}
-                            </div>
+                                    <div>
+                                        <div className="flex items-center justify-between mb-2">
+                                            <label htmlFor="minimalEngagementTime" className="block text-sm font-medium text-zinc-300">
+                                                Minimal Engagement Time (Hours)
+                                            </label>
+                                            <button
+                                                type="button"
+                                                onClick={() => handleToggle('minimalEngagementTimeEnabled')}
+                                                className={`w-8 h-4 rounded-full transition-colors relative ${formData.minimalEngagementTimeEnabled ? 'bg-primary' : 'bg-zinc-600'}`}
+                                            >
+                                                <div className={`absolute top-0.5 left-0.5 w-3 h-3 rounded-full bg-white transition-transform ${formData.minimalEngagementTimeEnabled ? 'translate-x-4' : 'translate-x-0'}`} />
+                                            </button>
+                                        </div>
+                                        {formData.minimalEngagementTimeEnabled && (
+                                            <input
+                                                type="number"
+                                                id="minimalEngagementTime"
+                                                name="minimalEngagementTime"
+                                                value={formData.minimalEngagementTime}
+                                                onChange={handleChange}
+                                                required={formData.minimalEngagementTimeEnabled}
+                                                min="0"
+                                                className="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-3 text-white placeholder:text-zinc-600 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all"
+                                                placeholder="e.g. 4"
+                                            />
+                                        )}
+                                    </div>
+                                </>
+                            )}
 
                             <div>
                                 <label className="block text-sm font-medium text-zinc-300 mb-2">
@@ -377,7 +416,7 @@ export default function ProfilePage() {
 
                             <div>
                                 <label htmlFor="portfolio" className="block text-sm font-medium text-zinc-300 mb-2">
-                                    Portfolio Link
+                                    {formData.role === 'candidate' ? 'Portfolio Link' : 'Website'}
                                 </label>
                                 <input
                                     type="url"
@@ -390,35 +429,38 @@ export default function ProfilePage() {
                                 />
                             </div>
 
-                            <div>
-                                <label className="block text-sm font-medium text-zinc-300 mb-2">
-                                    Skills
-                                </label>
-                                <div className="space-y-3">
-                                    <input
-                                        type="text"
-                                        value={newSkill}
-                                        onChange={(e) => setNewSkill(e.target.value)}
-                                        onKeyDown={handleAddSkill}
-                                        className="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-3 text-white placeholder:text-zinc-600 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all"
-                                        placeholder="Type a skill and press Enter"
-                                    />
-                                    <div className="flex flex-wrap gap-2">
-                                        {formData.skills.map((skill, index) => (
-                                            <div key={index} className="flex items-center gap-2 bg-primary/20 px-3 py-1.5 rounded-full border border-primary/30">
-                                                <span className="text-sm text-primary-foreground">{skill}</span>
-                                                <button
-                                                    type="button"
-                                                    onClick={() => handleRemoveSkill(skill)}
-                                                    className="text-primary-foreground/70 hover:text-white transition-colors"
-                                                >
-                                                    ×
-                                                </button>
-                                            </div>
-                                        ))}
+                            {/* Candidate Specific Fields */}
+                            {formData.role === 'candidate' && (
+                                <div>
+                                    <label className="block text-sm font-medium text-zinc-300 mb-2">
+                                        Skills
+                                    </label>
+                                    <div className="space-y-3">
+                                        <input
+                                            type="text"
+                                            value={newSkill}
+                                            onChange={(e) => setNewSkill(e.target.value)}
+                                            onKeyDown={handleAddSkill}
+                                            className="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-3 text-white placeholder:text-zinc-600 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all"
+                                            placeholder="Type a skill and press Enter"
+                                        />
+                                        <div className="flex flex-wrap gap-2">
+                                            {formData.skills.map((skill, index) => (
+                                                <div key={index} className="flex items-center gap-2 bg-primary/20 px-3 py-1.5 rounded-full border border-primary/30">
+                                                    <span className="text-sm text-primary-foreground">{skill}</span>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => handleRemoveSkill(skill)}
+                                                        className="text-primary-foreground/70 hover:text-white transition-colors"
+                                                    >
+                                                        ×
+                                                    </button>
+                                                </div>
+                                            ))}
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
+                            )}
 
                             <div className="pt-4">
                                 <Button

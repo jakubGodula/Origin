@@ -3,10 +3,11 @@
 import React, { useState } from 'react';
 
 import Link from 'next/link';
-import { ConnectButton } from '@mysten/dapp-kit';
+import { ConnectButton, useSuiClientContext } from '@mysten/dapp-kit';
 
 export const Header: React.FC = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const ctx = useSuiClientContext();
 
     return (
         <header className="fixed top-0 left-0 right-0 z-50 border-b border-white/10 bg-black/50 backdrop-blur-md">
@@ -42,8 +43,14 @@ export const Header: React.FC = () => {
                     Menu
                 </button>
 
-                <div className="flex items-center gap-4">
+                <div className="flex flex-col items-end">
                     <ConnectButton className="!bg-primary-transparent !text-primary !border !border-primary/30 hover:!bg-primary/20 !backdrop-blur-sm !font-medium !rounded-lg !px-6 !py-2 !transition-all !duration-200" />
+                    <button
+                        onClick={() => ctx.selectNetwork(ctx.network === 'testnet' ? 'devnet' : 'testnet')}
+                        className="text-[10px] uppercase tracking-wider text-zinc-500 hover:text-primary mt-1 transition-colors"
+                    >
+                        Switch to {ctx.network === 'testnet' ? 'Devnet' : 'Testnet'}
+                    </button>
                 </div>
             </div>
 

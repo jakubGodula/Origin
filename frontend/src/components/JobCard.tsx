@@ -4,14 +4,25 @@ import React from 'react';
 import Link from 'next/link';
 
 interface JobCardProps {
-    id: number;
+    id: string;
     title: string;
     description: string;
     price: string;
     tags: string[];
     postedBy: string;
     postedAt: string;
+    durationValue: number;
+    durationUnit: number;
+    location: string;
+    locationRequired: boolean;
 }
+
+const getDurationLabel = (value: number, unit: number) => {
+    if (unit === 0) return 'Indefinite';
+    const units = ['', 'Hour', 'Day', 'Month'];
+    const unitLabel = units[unit] || '';
+    return `${value} ${unitLabel}${value > 1 ? 's' : ''}`;
+};
 
 export const JobCard: React.FC<JobCardProps> = ({
     id,
@@ -20,7 +31,11 @@ export const JobCard: React.FC<JobCardProps> = ({
     price,
     tags,
     postedBy,
-    postedAt
+    postedAt,
+    durationValue,
+    durationUnit,
+    location,
+    locationRequired
 }) => {
     return (
         <Link href={`/jobs/view?id=${id}`} className="block w-full">
@@ -34,6 +49,22 @@ export const JobCard: React.FC<JobCardProps> = ({
                             <span className="text-primary font-mono font-bold text-lg md:hidden">
                                 {price} SUI
                             </span>
+                        </div>
+
+                        <div className="flex flex-wrap gap-4 text-sm text-zinc-400 mb-3">
+                            {location && (
+                                <div className="flex items-center gap-1">
+                                    <span className="text-zinc-500">📍</span>
+                                    <span>{location}</span>
+                                    {locationRequired && <span className="text-xs bg-red-500/20 text-red-400 px-1.5 py-0.5 rounded">Required</span>}
+                                </div>
+                            )}
+                            {(durationUnit !== 0 || durationValue > 0) && (
+                                <div className="flex items-center gap-1">
+                                    <span className="text-zinc-500">⏱️</span>
+                                    <span>{getDurationLabel(durationValue, durationUnit)}</span>
+                                </div>
+                            )}
                         </div>
 
                         <p className="text-zinc-400 mb-4 line-clamp-2">

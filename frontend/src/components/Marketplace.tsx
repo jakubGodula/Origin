@@ -2,11 +2,13 @@
 
 import React from 'react';
 import { JobCard } from './JobCard';
-import { MOCK_JOBS } from '@/utils/mockData';
 import { Button } from './Button';
 import Link from 'next/link';
+import { useJobs } from '@/hooks/useJobs';
 
 export const Marketplace: React.FC = () => {
+    const { data: jobs, isLoading, error } = useJobs();
+
     return (
         <section id="marketplace" className="py-24 px-6 bg-black/20">
             <div className="container mx-auto">
@@ -41,7 +43,14 @@ export const Marketplace: React.FC = () => {
                 </div>
 
                 <div className="flex flex-col gap-4">
-                    {MOCK_JOBS.map((job) => (
+                    {isLoading && <div className="text-white">Loading jobs...</div>}
+                    {error && <div className="text-red-500">Error loading jobs</div>}
+
+                    {!isLoading && jobs?.length === 0 && (
+                        <div className="text-zinc-400">No jobs found. Be the first to post one!</div>
+                    )}
+
+                    {jobs?.map((job) => (
                         <JobCard
                             key={job.id}
                             id={job.id}
@@ -51,6 +60,10 @@ export const Marketplace: React.FC = () => {
                             tags={job.tags}
                             postedBy={job.postedBy}
                             postedAt={job.postedAt}
+                            durationValue={job.durationValue}
+                            durationUnit={job.durationUnit}
+                            location={job.location}
+                            locationRequired={job.locationRequired}
                         />
                     ))}
                 </div>
