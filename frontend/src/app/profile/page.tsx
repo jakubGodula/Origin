@@ -3,9 +3,29 @@
 import React, { useState, useEffect } from 'react';
 import { Header } from '@/components/Header';
 import { Button } from '@/components/Button';
+import { useCurrentAccount, useSignAndExecuteTransaction, useSuiClientQuery } from '@mysten/dapp-kit';
+import { Transaction } from '@mysten/sui/transactions';
+import { PACKAGE_ID, CANDIDATE_MODULE, CANDIDATE_PROFILE_TYPE } from '@/utils/constants';
+import { CandidateProfile } from '@/types/types';
 
 export default function ProfilePage() {
+    const account = useCurrentAccount();
+    const { mutate: signAndExecuteTransaction } = useSignAndExecuteTransaction();
     const [isLoading, setIsLoading] = useState(false);
+
+    // Fetch existing profile
+    const { data: profileData, refetch: refetchProfile } = useSuiClientQuery(
+        'getOwnedObjects',
+        {
+            owner: account?.address || '',
+            filter: { StructType: CANDIDATE_PROFILE_TYPE },
+            options: { showContent: true }
+        },
+        {
+            enabled: !!account,
+        }
+    );
+
     const [formData, setFormData] = useState({
         role: 'candidate' as 'candidate' | 'employer',
         name: '',
@@ -26,21 +46,41 @@ export default function ProfilePage() {
         minimalEngagementTimeEnabled: false
     });
 
+    const [existingProfileId, setExistingProfileId] = useState<string | null>(null);
+
+    // Populate form when profile data is fetched
+    useEffect(() => {
+        if (profileData && profileData.data && profileData.data.length > 0) {
+            const object = profileData.data[0].data?.content as unknown as { fields: CandidateProfile };
+            if (object && object.fields) {
+                const fields = object.fields;
+                setExistingProfileId(fields.id.id);
+
+                setFormData({
+                    role: 'candidate', // Currently only candidate supported in contract
+                    name: fields.name,
+                    bio: fields.bio,
+                    portfolio: fields.portfolio_link,
+                    skills: fields.skills,
+                    location: fields.location,
+                    nationality: fields.nationality,
+                    preferredCurrency: fields.preferred_currency,
+                    pictureUrl: fields.picture_url,
+                    locationPrivate: fields.location_private,
+                    nationalityPrivate: fields.nationality_private,
+                    contactInfo: fields.contact_info.map(c => ({ value: c.value, isPrivate: c.is_private })),
+                    hourlyRate: fields.hourly_rate,
+                    emergencyRate: fields.emergency_rate ? fields.emergency_rate.fields.value : '',
+                    emergencyRateEnabled: !!fields.emergency_rate,
+                    minimalEngagementTime: fields.minimal_engagement_time ? fields.minimal_engagement_time.fields.value : '',
+                    minimalEngagementTimeEnabled: !!fields.minimal_engagement_time
+                });
+            }
+        }
+    }, [profileData]);
+
     const [newSkill, setNewSkill] = useState('');
     const [newContact, setNewContact] = useState('');
-
-    useEffect(() => {
-        const savedProfile = localStorage.getItem('userProfile');
-        if (savedProfile) {
-            // Wrap in setTimeout to avoid "synchronous setState in effect" lint warning
-            setTimeout(() => {
-                const parsed = JSON.parse(savedProfile);
-                // Ensure role exists for backward compatibility
-                if (!parsed.role) parsed.role = 'candidate';
-                setFormData(parsed);
-            }, 0);
-        }
-    }, []);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
@@ -108,16 +148,80 @@ export default function ProfilePage() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        if (!account) {
+            alert("Please connect your wallet first");
+            return;
+        }
         setIsLoading(true);
 
-        // Simulate saving to blockchain/storage
-        await new Promise(resolve => setTimeout(resolve, 800));
+        try {
+            const tx = new Transaction();
 
-        localStorage.setItem('userProfile', JSON.stringify(formData));
+            const functionName = existingProfileId ? 'update_profile' : 'create_profile';
+            const args = [
+                tx.pure.string(formData.name),
+                tx.pure.string(formData.bio),
+                tx.pure.string(formData.portfolio),
+                tx.makeMoveVec({ type: '0x1::string::String', elements: formData.skills.map(s => tx.pure.string(s)) }),
+                tx.pure.string(formData.location),
+                tx.pure.string(formData.nationality),
+                tx.pure.string(formData.preferredCurrency),
+                tx.pure.string(formData.pictureUrl),
+                tx.pure.bool(formData.locationPrivate),
+                tx.pure.bool(formData.nationalityPrivate),
+                tx.makeMoveVec({ type: '0x1::string::String', elements: formData.contactInfo.map(c => tx.pure.string(c.value)) }),
+                tx.makeMoveVec({ type: 'bool', elements: formData.contactInfo.map(c => tx.pure.bool(c.isPrivate)) }),
+                tx.pure.u64(Number(formData.hourlyRate)),
+                tx.pure.u64(Number(formData.emergencyRate || 0)),
+                tx.pure.bool(formData.emergencyRateEnabled),
+                tx.pure.u64(Number(formData.minimalEngagementTime || 0)),
+                tx.pure.bool(formData.minimalEngagementTimeEnabled),
+            ];
 
-        alert("Profile saved successfully!");
-        setIsLoading(false);
+            if (existingProfileId) {
+                // For update, the first argument is the profile object
+                args.unshift(tx.object(existingProfileId));
+            }
+
+            tx.moveCall({
+                target: `${PACKAGE_ID}::${CANDIDATE_MODULE}::${functionName}`,
+                arguments: args,
+            });
+
+            signAndExecuteTransaction(
+                {
+                    transaction: tx,
+                },
+                {
+                    onSuccess: async () => {
+                        alert("Profile saved successfully!");
+                        await refetchProfile();
+                    },
+                    onError: (err) => {
+                        console.error("Transaction failed:", err);
+                        alert("Failed to save profile. See console for details.");
+                    }
+                }
+            );
+        } catch (error) {
+            console.error("Error preparing transaction:", error);
+            alert("An error occurred. See console for details.");
+        } finally {
+            setIsLoading(false);
+        }
     };
+
+    if (!account) {
+        return (
+            <div className="min-h-screen bg-background text-foreground selection:bg-primary/30">
+                <Header />
+                <main className="pt-24 pb-12 px-6 flex flex-col items-center justify-center min-h-[60vh]">
+                    <h1 className="text-3xl font-bold text-white mb-4">Connect Wallet</h1>
+                    <p className="text-zinc-400 mb-8">Please connect your wallet to manage your profile.</p>
+                </main>
+            </div>
+        );
+    }
 
     return (
         <div className="min-h-screen bg-background text-foreground selection:bg-primary/30">
@@ -136,8 +240,8 @@ export default function ProfilePage() {
                                     type="button"
                                     onClick={() => handleRoleChange('candidate')}
                                     className={`flex-1 py-2 text-sm font-medium rounded-md transition-all ${formData.role === 'candidate'
-                                            ? 'bg-primary text-white shadow-lg'
-                                            : 'text-zinc-400 hover:text-white'
+                                        ? 'bg-primary text-white shadow-lg'
+                                        : 'text-zinc-400 hover:text-white'
                                         }`}
                                 >
                                     Candidate
@@ -146,8 +250,8 @@ export default function ProfilePage() {
                                     type="button"
                                     onClick={() => handleRoleChange('employer')}
                                     className={`flex-1 py-2 text-sm font-medium rounded-md transition-all ${formData.role === 'employer'
-                                            ? 'bg-primary text-white shadow-lg'
-                                            : 'text-zinc-400 hover:text-white'
+                                        ? 'bg-primary text-white shadow-lg'
+                                        : 'text-zinc-400 hover:text-white'
                                         }`}
                                 >
                                     Employer

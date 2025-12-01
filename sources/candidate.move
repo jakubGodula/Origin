@@ -5,6 +5,10 @@ module origin::candidate {
     // ===== Errors =====
     const ENotAuthorized: u64 = 0;
 
+    // ===== Constants =====
+    const STATUS_ACTIVE: u8 = 0;
+    const STATUS_MODIFIED: u8 = 1;
+
     // ===== Structs =====
 
     public struct ContactItem has store, copy, drop {
@@ -30,6 +34,7 @@ module origin::candidate {
         emergency_rate: Option<u64>,
         minimal_engagement_time: Option<u64>,
         owner: address,
+        status: u8,
     }
 
     // ===== Events =====
@@ -37,6 +42,7 @@ module origin::candidate {
     public struct ProfileCreated has copy, drop {
         profile_id: ID,
         owner: address,
+        status: u8,
     }
 
     public struct ProfileUpdated has copy, drop {
@@ -110,14 +116,54 @@ module origin::candidate {
             emergency_rate,
             minimal_engagement_time,
             owner,
+            status: STATUS_ACTIVE,
         };
 
         event::emit(ProfileCreated {
             profile_id,
             owner,
+            status: STATUS_ACTIVE,
         });
 
         transfer::transfer(profile, owner);
+    }
+
+    /// Create a modified copy of an existing profile
+    public entry fun clone_profile(
+        profile: &CandidateProfile,
+        ctx: &mut TxContext
+    ) {
+        let id = object::new(ctx);
+        let profile_id = object::uid_to_inner(&id);
+        let owner = tx_context::sender(ctx);
+
+        let new_profile = CandidateProfile {
+            id,
+            name: profile.name,
+            bio: profile.bio,
+            portfolio_link: profile.portfolio_link,
+            skills: profile.skills,
+            location: profile.location,
+            nationality: profile.nationality,
+            preferred_currency: profile.preferred_currency,
+            picture_url: profile.picture_url,
+            location_private: profile.location_private,
+            nationality_private: profile.nationality_private,
+            contact_info: profile.contact_info,
+            hourly_rate: profile.hourly_rate,
+            emergency_rate: profile.emergency_rate,
+            minimal_engagement_time: profile.minimal_engagement_time,
+            owner,
+            status: STATUS_MODIFIED,
+        };
+
+        event::emit(ProfileCreated {
+            profile_id,
+            owner,
+            status: STATUS_MODIFIED,
+        });
+
+        transfer::transfer(new_profile, owner);
     }
 
     /// Update an existing candidate profile
@@ -243,5 +289,9 @@ module origin::candidate {
 
     public fun get_minimal_engagement_time(profile: &CandidateProfile): Option<u64> {
         profile.minimal_engagement_time
+    }
+
+    public fun get_status(profile: &CandidateProfile): u8 {
+        profile.status
     }
 }
