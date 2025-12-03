@@ -2,6 +2,9 @@ module origin::candidate {
     use std::string::{String};
     use sui::event;
 
+    use sui::package;
+    use sui::display;
+
     // ===== Errors =====
     const ENotAuthorized: u64 = 0;
 
@@ -10,6 +13,9 @@ module origin::candidate {
     const STATUS_MODIFIED: u8 = 1;
 
     // ===== Structs =====
+
+    /// OTW for the module
+    public struct CANDIDATE has drop {}
 
     public struct ContactItem has store, copy, drop {
         value: String,
@@ -51,6 +57,34 @@ module origin::candidate {
     }
 
     // ===== Public Functions =====
+
+    fun init(otw: CANDIDATE, ctx: &mut TxContext) {
+        let publisher = package::claim(otw, ctx);
+
+        let mut keys = vector::empty<String>();
+        let mut values = vector::empty<String>();
+
+        vector::push_back(&mut keys, std::string::utf8(b"name"));
+        vector::push_back(&mut values, std::string::utf8(b"{name}"));
+
+        vector::push_back(&mut keys, std::string::utf8(b"description"));
+        vector::push_back(&mut values, std::string::utf8(b"{bio}"));
+
+        vector::push_back(&mut keys, std::string::utf8(b"image_url"));
+        vector::push_back(&mut values, std::string::utf8(b"{picture_url}"));
+
+        vector::push_back(&mut keys, std::string::utf8(b"project_url"));
+        vector::push_back(&mut values, std::string::utf8(b"{portfolio_link}"));
+
+        let mut display = display::new_with_fields<CandidateProfile>(
+            &publisher, keys, values, ctx
+        );
+
+        display::update_version(&mut display);
+
+        transfer::public_transfer(publisher, tx_context::sender(ctx));
+        transfer::public_transfer(display, tx_context::sender(ctx));
+    }
 
     /// Create a new candidate profile
     public entry fun create_profile(

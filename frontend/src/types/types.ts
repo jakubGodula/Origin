@@ -22,15 +22,29 @@ export interface CandidateProfile {
     emergency_rate: {
         type: string;
         fields: {
-            value: string;
+            vec: string[];
         }
     } | null;
     minimal_engagement_time: {
         type: string;
         fields: {
-            value: string;
+            vec: string[];
         }
     } | null;
+    owner: string;
+    status: number;
+}
+
+export interface EmployerProfile {
+    id: {
+        id: string;
+    };
+    name: string;
+    bio: string;
+    location: string;
+    website: string;
+    logo_url: string;
+    contact_info: ContactItem[];
     owner: string;
     status: number;
 }

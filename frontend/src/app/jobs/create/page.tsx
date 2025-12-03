@@ -1,13 +1,14 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Header } from '@/components/Header';
 import { Button } from '@/components/Button';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useSignAndExecuteTransaction, useCurrentAccount } from '@mysten/dapp-kit';
+import { useSignAndExecuteTransaction, useCurrentAccount, useSuiClientQuery } from '@mysten/dapp-kit';
 import { Transaction } from '@mysten/sui/transactions';
-import { PACKAGE_ID, MARKETPLACE_ID, MODULE_NAME, CLOCK_ID } from '@/utils/constants';
+import { PACKAGE_ID, MARKETPLACE_ID, MODULE_NAME, CLOCK_ID, EMPLOYER_PROFILE_TYPE } from '@/utils/constants';
+import { EmployerProfile } from '@/types/types';
 
 export default function CreateJobPage() {
     const router = useRouter();
@@ -18,6 +19,41 @@ export default function CreateJobPage() {
     const [skills, setSkills] = useState<{ name: string; years: number }[]>([]);
     const [newSkillName, setNewSkillName] = useState('');
     const [newSkillYears, setNewSkillYears] = useState(1);
+
+    // Employer Profile State
+    const [selectedProfileId, setSelectedProfileId] = useState<string>('');
+    const [companyName, setCompanyName] = useState('');
+    const [logoUrl, setLogoUrl] = useState('');
+
+    // Fetch Employer Profiles
+    const { data: employerProfiles } = useSuiClientQuery(
+        'getOwnedObjects',
+        {
+            owner: account?.address || '',
+            filter: { StructType: EMPLOYER_PROFILE_TYPE },
+            options: { showContent: true }
+        },
+        { enabled: !!account }
+    );
+
+    const profiles: EmployerProfile[] = employerProfiles?.data.map((obj) => {
+        if (obj.data?.content?.dataType === 'moveObject') {
+            return obj.data.content.fields as unknown as EmployerProfile;
+        }
+        return null;
+    }).filter((p): p is EmployerProfile => p !== null) || [];
+
+    // Auto-fill when profile is selected
+    useEffect(() => {
+        if (selectedProfileId) {
+            const profile = profiles.find(p => p.id.id === selectedProfileId);
+            if (profile) {
+                setCompanyName(profile.name);
+                setLogoUrl(profile.logo_url);
+            }
+        }
+    }, [selectedProfileId, profiles]);
+
 
     const addSkill = () => {
         if (newSkillName.trim()) {
@@ -68,15 +104,17 @@ export default function CreateJobPage() {
                 tx.pure.string(title),
                 tx.pure.string(description),
                 tx.pure.string(details),
-                tx.pure.vector("vector<u8>", skills.map(s => new TextEncoder().encode(s.name))), // skill_names
+                tx.pure.vector("vector<u8>", skills.map(s => Array.from(new TextEncoder().encode(s.name)))), // skill_names
                 tx.pure.vector("u8", skills.map(s => s.years)), // skill_exps
-                tx.pure.vector("vector<u8>", tags.map(tag => new TextEncoder().encode(tag))), // tags
+                tx.pure.vector("vector<u8>", tags.map(tag => Array.from(new TextEncoder().encode(tag)))), // tags
                 tx.pure.u64(budgetMIST),
                 tx.pure.u8(parseInt(paymentType)),
                 tx.pure.u64(parseInt(durationValue) || 0),
                 tx.pure.u8(parseInt(durationUnit)),
                 tx.pure.vector("u8", new TextEncoder().encode(location)),
                 tx.pure.bool(locationRequired),
+                tx.pure.vector("u8", new TextEncoder().encode(companyName)), // company_name
+                tx.pure.vector("u8", new TextEncoder().encode(logoUrl)),     // logo_url
                 tx.pure.u64(deadline),
                 tx.object(CLOCK_ID),
             ],
@@ -123,6 +161,49 @@ export default function CreateJobPage() {
                             </div>
                         ) : (
                             <form onSubmit={handleSubmit} className="space-y-6">
+                                {/* Employer Profile Selection */}
+                                <div className="bg-white/5 p-4 rounded-xl border border-white/10 mb-6">
+                                    <label htmlFor="profileSelect" className="block text-sm font-medium text-zinc-300 mb-2">
+                                        Select Employer Profile (Optional)
+                                    </label>
+                                    <select
+                                        id="profileSelect"
+                                        value={selectedProfileId}
+                                        onChange={(e) => setSelectedProfileId(e.target.value)}
+                                        className="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all mb-4"
+                                    >
+                                        <option value="">-- Select a Profile --</option>
+                                        {profiles.map(profile => (
+                                            <option key={profile.id.id} value={profile.id.id}>
+                                                {profile.name}
+                                            </option>
+                                        ))}
+                                    </select>
+
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div>
+                                            <label className="block text-xs text-zinc-400 mb-1">Company Name</label>
+                                            <input
+                                                type="text"
+                                                value={companyName}
+                                                onChange={(e) => setCompanyName(e.target.value)}
+                                                className="w-full bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-primary/50"
+                                                placeholder="Company Name"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-xs text-zinc-400 mb-1">Logo URL</label>
+                                            <input
+                                                type="text"
+                                                value={logoUrl}
+                                                onChange={(e) => setLogoUrl(e.target.value)}
+                                                className="w-full bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-primary/50"
+                                                placeholder="https://..."
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+
                                 <div>
                                     <label htmlFor="title" className="block text-sm font-medium text-zinc-300 mb-2">
                                         Job Title

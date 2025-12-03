@@ -1,44 +1,103 @@
 "use client";
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { CandidateCard } from '@/components/CandidateCard';
-
-const MOCK_CANDIDATES = [
-    {
-        id: 1,
-        name: "Alex Rivera",
-        role: "Senior Smart Contract Engineer",
-        rate: "150",
-        skills: ["Move", "Rust", "Solidity", "DeFi"],
-        bio: "Experienced blockchain developer with a focus on Move and Sui. I have built multiple DeFi protocols and have a deep understanding of smart contract security.",
-    },
-    {
-        id: 2,
-        name: "Sarah Chen",
-        role: "Full Stack Web3 Developer",
-        rate: "120",
-        skills: ["React", "Next.js", "TypeScript", "Sui SDK"],
-        bio: "Full stack developer specializing in building intuitive dApps. I bridge the gap between complex smart contracts and user-friendly interfaces.",
-    },
-    {
-        id: 3,
-        name: "Michael O'Connor",
-        role: "Blockchain Architect",
-        rate: "200",
-        skills: ["System Design", "Cryptography", "Move", "Zero Knowledge"],
-        bio: "Architecting scalable and secure blockchain solutions. Passionate about privacy and zero-knowledge proofs.",
-    },
-    {
-        id: 4,
-        name: "Emily Zhang",
-        role: "Smart Contract Auditor",
-        rate: "180",
-        skills: ["Security Auditing", "Move", "Formal Verification"],
-        bio: "Ensuring the safety of your funds through rigorous smart contract auditing and formal verification.",
-    }
-];
+import { useSuiClient } from '@mysten/dapp-kit';
+import { PACKAGE_ID, CANDIDATE_MODULE } from '@/utils/constants';
+import { CandidateProfile } from '@/types/types';
 
 export default function CandidatesPage() {
+    const suiClient = useSuiClient();
+    const [candidates, setCandidates] = useState<CandidateProfile[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+
+    useEffect(() => {
+        const fetchCandidates = async () => {
+            try {
+                // 1. Fetch ProfileCreated events
+                const events = await suiClient.queryEvents({
+                    query: {
+                        MoveModule: {
+                            package: PACKAGE_ID,
+                            module: CANDIDATE_MODULE,
+                        },
+                    },
+                    limit: 50,
+                    order: "descending",
+                });
+
+                // Filter for ProfileCreated events
+                const profileIds = events.data
+                    .filter((event) => event.type.includes("::ProfileCreated"))
+                    // @ts-ignore
+                    .map((event) => event.parsedJson?.profile_id as string);
+
+                if (profileIds.length === 0) {
+                    setCandidates([]);
+                    setIsLoading(false);
+                    return;
+                }
+
+                // 2. Fetch the actual objects
+                const objects = await suiClient.multiGetObjects({
+                    ids: profileIds,
+                    options: { showContent: true },
+                });
+
+                const fetchedCandidates: CandidateProfile[] = objects
+                    .map((obj) => {
+                        if (obj.data?.content?.dataType === 'moveObject') {
+                            return obj.data.content.fields as unknown as CandidateProfile;
+                        }
+                        return null;
+                    })
+                    .filter((c): c is CandidateProfile => c !== null);
+
+                console.log("Fetched Candidates:", fetchedCandidates);
+                const getOptionValue = (option: any) => {
+                    if (option === null || option === undefined) return undefined;
+                    if (typeof option === 'object') {
+                        if ('fields' in option && 'vec' in option.fields) {
+                            return option.fields.vec[0];
+                        }
+                        if ('vec' in option) {
+                            return option.vec[0];
+                        }
+                        // Fallback for empty object or unexpected structure
+                        return undefined;
+                    }
+                    // If it's a primitive (string/number), return it directly
+                    return option.toString();
+                };
+
+                setCandidates(fetchedCandidates);
+            } catch (err: any) {
+                console.error("Error fetching candidates:", err);
+                setError(err.message);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchCandidates();
+    }, [suiClient]);
+
+    // Helper to extract option value safely
+    const getOptionValue = (option: any) => {
+        if (option === null || option === undefined) return undefined;
+        if (typeof option === 'object') {
+            if ('fields' in option && 'vec' in option.fields) {
+                return option.fields.vec[0];
+            }
+            if ('vec' in option) {
+                return option.vec[0];
+            }
+            return undefined;
+        }
+        return option.toString();
+    };
+
     return (
         <main className="min-h-screen pt-24 pb-12 px-6">
             <div className="container mx-auto max-w-5xl">
@@ -49,15 +108,26 @@ export default function CandidatesPage() {
                     </p>
                 </div>
 
+                {isLoading && <div className="text-white">Loading candidates...</div>}
+                {error && <div className="text-red-400">Error loading candidates: {error}</div>}
+
+                {!isLoading && !error && candidates.length === 0 && (
+                    <div className="text-zinc-400">No candidates found.</div>
+                )}
+
                 <div className="grid grid-cols-1 gap-6">
-                    {MOCK_CANDIDATES.map((candidate) => (
+                    {candidates.map((candidate) => (
                         <CandidateCard
-                            key={candidate.id}
+                            key={candidate.id.id}
                             name={candidate.name}
-                            role={candidate.role}
-                            rate={candidate.rate}
+                            role="Candidate" // We might want to add a 'title' field to the struct later, for now hardcode or use bio snippet
+                            rate={candidate.hourly_rate}
+                            currency={candidate.preferred_currency}
                             skills={candidate.skills}
                             bio={candidate.bio}
+                            imageUrl={candidate.picture_url}
+                            emergencyRate={getOptionValue(candidate.emergency_rate)}
+                            minimalEngagementTime={getOptionValue(candidate.minimal_engagement_time)}
                         />
                     ))}
                 </div>

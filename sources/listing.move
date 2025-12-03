@@ -58,6 +58,8 @@ module origin::listing {
         duration_unit: u8,
         location: String,
         location_required: bool,
+        company_name: String,
+        logo_url: String,
         currency: String,  // "SUI" initially
         deadline: u64,     // timestamp
         status: u8,        // 0=Open, 1=InProgress, 2=Completed, 3=Cancelled
@@ -123,6 +125,8 @@ module origin::listing {
         duration_unit: u8,
         location: vector<u8>,
         location_required: bool,
+        company_name: vector<u8>,
+        logo_url: vector<u8>,
         deadline: u64,
         clock: &Clock,
         ctx: &mut TxContext
@@ -169,6 +173,8 @@ module origin::listing {
             duration_unit,
             location: string::utf8(location),
             location_required,
+            company_name: string::utf8(company_name),
+            logo_url: string::utf8(logo_url),
             currency: string::utf8(b"SUI"),
             deadline,
             status: STATUS_OPEN,
