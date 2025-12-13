@@ -116,6 +116,11 @@ export default function AdminPage() {
             }
 
             try {
+                if (marketplace.data.content.dataType !== 'moveObject') {
+                    setIsLoadingModerators(false);
+                    return;
+                }
+
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 const fields = marketplace.data.content.fields as any;
                 const moderatorsTableId = fields?.moderators?.fields?.id?.id;
