@@ -4,9 +4,7 @@ import React, { Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useSuiClientQuery } from '@mysten/dapp-kit';
 import { Header } from '@/components/Header';
-import { CANDIDATE_PROFILE_TYPE } from '@/utils/constants';
 import { CandidateProfile } from '@/types/types';
-import { formatSui } from '@/utils/format';
 
 function ProfileViewContent() {
     const searchParams = useSearchParams();
@@ -52,12 +50,14 @@ function ProfileViewContent() {
     const object = objectData;
 
     const rawFields = object?.data?.content?.dataType === 'moveObject'
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         ? (object.data.content.fields as any)
         : null;
 
     console.log('Raw Profile Fields:', rawFields);
 
     // Helper to extract fields from vector of structs
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const mapVectorStruct = (arr: any[]) => {
         return (arr || []).map(item => item.fields || item);
     };
@@ -93,6 +93,7 @@ function ProfileViewContent() {
     // function formatSui removed
 
     // Helper to extract option value safely
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const getOptionValue = (option: any) => {
         if (option === null || option === undefined) return undefined;
         if (typeof option === 'object') {
@@ -123,6 +124,7 @@ function ProfileViewContent() {
                 <div className="relative flex flex-col md:flex-row items-end md:items-center gap-6 mt-8">
                     <div className="w-32 h-32 rounded-full border-4 border-[#0a0a0a] bg-black overflow-hidden shadow-xl shrink-0">
                         {profile.picture_url ? (
+                            // eslint-disable-next-line @next/next/no-img-element
                             <img src={profile.picture_url} className="w-full h-full object-cover" alt={profile.name} />
                         ) : (
                             <div className="w-full h-full flex items-center justify-center text-4xl bg-white/10">👤</div>

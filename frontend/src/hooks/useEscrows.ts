@@ -20,6 +20,7 @@ export interface Escrow {
 
 export const parseEscrowFromSuiObject = (obj: SuiObjectResponse): Escrow | null => {
     if (obj.error || !obj.data) return null;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const fields = obj.data.content?.dataType === 'moveObject' ? (obj.data.content.fields as any) : null;
     if (!fields) return null;
 
@@ -44,6 +45,7 @@ export const parseEscrowFromSuiObject = (obj: SuiObjectResponse): Escrow | null 
             } else if (typeof inner === 'object') {
                 // Fallback: try to see if it has 'bytes' property directly
                 if ('bytes' in inner) {
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
                     workOid = (inner as any).bytes;
                 } else {
                     workOid = JSON.stringify(inner);
@@ -101,6 +103,7 @@ export function useEscrows() {
             }
 
             // 2. Get object IDs
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const escrowIds = createdEvents.map((event) => (event.parsedJson as any).escrow_id);
 
             // 3. Fetch objects

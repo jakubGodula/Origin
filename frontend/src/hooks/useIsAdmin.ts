@@ -20,7 +20,7 @@ export function useIsAdmin() {
             try {
                 // Create a transaction to call the is_admin function
                 const tx = new Transaction();
-                const [isAdminResult] = tx.moveCall({
+                tx.moveCall({
                     target: `${PACKAGE_ID}::marketplace::is_admin`,
                     arguments: [
                         tx.object(MARKETPLACE_ID),

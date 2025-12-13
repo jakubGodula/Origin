@@ -45,15 +45,6 @@ export default function CreateJobPage() {
     }).filter((p): p is EmployerProfile => p !== null) || [];
 
     // Auto-fill when profile is selected
-    useEffect(() => {
-        if (selectedProfileId) {
-            const profile = profiles.find(p => p.id.id === selectedProfileId);
-            if (profile) {
-                setCompanyName(profile.name);
-                setLogoUrl(profile.logo_url);
-            }
-        }
-    }, [selectedProfileId, profiles]);
 
 
     const addSkill = () => {
@@ -171,7 +162,15 @@ export default function CreateJobPage() {
                                     <select
                                         id="profileSelect"
                                         value={selectedProfileId}
-                                        onChange={(e) => setSelectedProfileId(e.target.value)}
+                                        onChange={(e) => {
+                                            const newId = e.target.value;
+                                            setSelectedProfileId(newId);
+                                            const profile = profiles.find(p => p.id.id === newId);
+                                            if (profile) {
+                                                setCompanyName(profile.name);
+                                                setLogoUrl(profile.logo_url);
+                                            }
+                                        }}
                                         className="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all mb-4"
                                     >
                                         <option value="">-- Select a Profile --</option>

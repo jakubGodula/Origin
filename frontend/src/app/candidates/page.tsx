@@ -32,8 +32,8 @@ export default function CandidatesPage() {
                 // Filter for ProfileCreated events
                 const profileIds = events.data
                     .filter((event) => event.type.includes("::ProfileCreated"))
-                    // @ts-ignore
-                    .map((event) => event.parsedJson?.profile_id as string);
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    .map((event) => (event.parsedJson as any)?.profile_id as string);
 
                 if (profileIds.length === 0) {
                     setCandidates([]);
@@ -57,21 +57,6 @@ export default function CandidatesPage() {
                     .filter((c): c is CandidateProfile => c !== null);
 
                 console.log("Fetched Candidates:", fetchedCandidates);
-                const getOptionValue = (option: any) => {
-                    if (option === null || option === undefined) return undefined;
-                    if (typeof option === 'object') {
-                        if ('fields' in option && 'vec' in option.fields) {
-                            return option.fields.vec[0];
-                        }
-                        if ('vec' in option) {
-                            return option.vec[0];
-                        }
-                        // Fallback for empty object or unexpected structure
-                        return undefined;
-                    }
-                    // If it's a primitive (string/number), return it directly
-                    return option.toString();
-                };
 
                 setCandidates(fetchedCandidates);
 
@@ -98,7 +83,7 @@ export default function CandidatesPage() {
                 }));
                 setReputationProfiles(reputationMap);
 
-            } catch (err: any) {
+            } catch (err: any) { // eslint-disable-line @typescript-eslint/no-explicit-any
                 console.error("Error fetching candidates:", err);
                 setError(err.message);
             } finally {
@@ -110,6 +95,7 @@ export default function CandidatesPage() {
     }, [suiClient]);
 
     // Helper to extract option value safely
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const getOptionValue = (option: any) => {
         if (option === null || option === undefined) return undefined;
         if (typeof option === 'object') {
@@ -133,7 +119,9 @@ export default function CandidatesPage() {
         const scores = profile.skill_scores.fields.contents;
         const counts = profile.skill_counts.fields.contents;
 
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const scoreEntry = scores.find((s: any) => s.key === skillName);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const countEntry = counts.find((c: any) => c.key === skillName);
 
         if (!scoreEntry || !countEntry) return { rating: 0, count: 0 };
@@ -197,8 +185,8 @@ export default function CandidatesPage() {
                                 nationalities={candidate.nationalities}
                                 nationalitiesPrivate={candidate.nationalities_private}
                                 education={(() => {
-                                    // @ts-ignore - Handle raw Move object structure
-                                    const firstEdu = candidate.education?.[0]?.fields;
+                                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                                    const firstEdu = (candidate.education as any[])?.[0]?.fields;
                                     if (firstEdu) {
                                         return `${firstEdu.degree} @ ${firstEdu.institution}`;
                                         // or "MSc in CS at MIT" - let's stick to "Degree @ Institution" or "Degree at Institution"

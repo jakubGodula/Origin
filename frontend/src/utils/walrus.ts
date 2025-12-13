@@ -17,6 +17,7 @@ export interface WalrusUploadResponse {
         };
         cost: number;
     };
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     alreadyCertified: any;
 }
 

@@ -14,11 +14,10 @@ export default function AdminPage() {
     const account = useCurrentAccount();
     const suiClient = useSuiClient();
     const { isAdmin, isLoading: isAdminLoading } = useIsAdmin();
-    const { isSuperAdmin, loading: isSuperAdminLoading } = useIsSuperAdmin();
+    const { isSuperAdmin } = useIsSuperAdmin();
     const { mutate: signAndExecuteTransaction } = useSignAndExecuteTransaction();
     const [newFee, setNewFee] = useState('');
     const [newAdminAddress, setNewAdminAddress] = useState('');
-    const [removeAdminAddress, setRemoveAdminAddress] = useState('');
     const [transferAdminAddress, setTransferAdminAddress] = useState('');
     const [newModeratorAddress, setNewModeratorAddress] = useState('');
     const [selectedLanguages, setSelectedLanguages] = useState<string[]>([]);
@@ -75,6 +74,7 @@ export default function AdminPage() {
                 const marketplaceContent = marketplace.data.content;
                 if (!marketplaceContent || !('fields' in marketplaceContent)) return;
 
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 const fields = marketplaceContent.fields as any;
                 const adminsTableId = fields.admins?.fields?.id?.id;
 
@@ -89,6 +89,7 @@ export default function AdminPage() {
                     parentId: adminsTableId,
                 });
 
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 const adminAddresses = dynamicFields.data.map((field: any) => {
                     // The name of the dynamic field is the admin address
                     return field.name.value;
@@ -115,6 +116,7 @@ export default function AdminPage() {
             }
 
             try {
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 const fields = marketplace.data.content.fields as any;
                 const moderatorsTableId = fields?.moderators?.fields?.id?.id;
 
@@ -130,13 +132,14 @@ export default function AdminPage() {
 
                 // Fetch each moderator's details (languages)
                 const moderatorsWithLanguages = await Promise.all(
-                    dynamicFields.data.map(async (field: any) => {
+                    dynamicFields.data.map(async (field: any) => { // eslint-disable-line @typescript-eslint/no-explicit-any
                         try {
                             const fieldData = await suiClient.getDynamicFieldObject({
                                 parentId: moderatorsTableId,
                                 name: field.name,
                             });
 
+                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
                             const moderatorData = fieldData.data?.content as any;
                             const languages = moderatorData?.fields?.value || [];
 
@@ -200,6 +203,7 @@ export default function AdminPage() {
     // Extract marketplace fields
     const marketplaceContent = marketplace?.data?.content;
     const fields = marketplaceContent && 'fields' in marketplaceContent
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         ? (marketplaceContent.fields as any)
         : null;
 
@@ -249,7 +253,7 @@ export default function AdminPage() {
                     },
                 }
             );
-        } catch (error: any) {
+        } catch (error: any) { // eslint-disable-line @typescript-eslint/no-explicit-any
             console.error('Error updating fee:', error);
             alert(`Failed to update fee: ${error.message}`);
         } finally {
@@ -289,7 +293,7 @@ export default function AdminPage() {
                     },
                 }
             );
-        } catch (error: any) {
+        } catch (error: any) { // eslint-disable-line @typescript-eslint/no-explicit-any
             console.error('Error toggling pause:', error);
             alert(`Failed to toggle pause: ${error.message}`);
         } finally {
@@ -337,7 +341,7 @@ export default function AdminPage() {
                     },
                 }
             );
-        } catch (error: any) {
+        } catch (error: any) { // eslint-disable-line @typescript-eslint/no-explicit-any
             console.error('Error adding admin:', error);
             alert(`Failed to add admin: ${error.message}`);
         } finally {
@@ -383,7 +387,7 @@ export default function AdminPage() {
                     },
                 }
             );
-        } catch (error: any) {
+        } catch (error: any) { // eslint-disable-line @typescript-eslint/no-explicit-any
             console.error('Error removing admin:', error);
             alert(`Failed to remove admin: ${error.message}`);
         } finally {
@@ -434,7 +438,7 @@ export default function AdminPage() {
                     },
                 }
             );
-        } catch (error: any) {
+        } catch (error: any) { // eslint-disable-line @typescript-eslint/no-explicit-any
             console.error('Error promoting to super admin:', error);
             alert(`Failed to promote: ${error.message}`);
         } finally {
@@ -483,7 +487,7 @@ export default function AdminPage() {
                     },
                 }
             );
-        } catch (error: any) {
+        } catch (error: any) { // eslint-disable-line @typescript-eslint/no-explicit-any
             console.error('Error adding moderator:', error);
             alert(`Failed to add moderator: ${error.message}`);
         } finally {
@@ -527,7 +531,7 @@ export default function AdminPage() {
                     },
                 }
             );
-        } catch (error: any) {
+        } catch (error: any) { // eslint-disable-line @typescript-eslint/no-explicit-any
             console.error('Error removing moderator:', error);
             alert(`Failed to remove moderator: ${error.message}`);
         } finally {
@@ -575,7 +579,7 @@ export default function AdminPage() {
                     },
                 }
             );
-        } catch (error: any) {
+        } catch (error: any) { // eslint-disable-line @typescript-eslint/no-explicit-any
             console.error('Error updating moderator languages:', error);
             alert(`Failed to update languages: ${error.message}`);
         } finally {

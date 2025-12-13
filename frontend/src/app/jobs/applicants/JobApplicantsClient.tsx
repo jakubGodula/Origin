@@ -63,6 +63,7 @@ export function JobApplicantsClient() {
     const jobApplications = (applicationsData?.data || [])
         .map(obj => {
             if (obj.data?.content?.dataType === 'moveObject') {
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 return obj.data.content.fields as any;
             }
             return null;
@@ -260,6 +261,7 @@ function ApplicantCard({ applicantAddress, proposal, price, appliedAt, estimated
     );
 
     const profile = profileData?.data?.[0]?.data?.content?.dataType === 'moveObject'
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         ? (profileData.data[0].data.content.fields as unknown as CandidateProfile)
         : null;
 
@@ -318,6 +320,7 @@ function ApplicantCard({ applicantAddress, proposal, price, appliedAt, estimated
                 <Link href={`/profile/view?address=${applicantAddress}`} className="flex items-center gap-4 group">
                     <div className="w-12 h-12 rounded-full bg-white/10 overflow-hidden group-hover:ring-2 ring-primary transition-all">
                         {profile.picture_url ? (
+                            // eslint-disable-next-line @next/next/no-img-element
                             <img src={profile.picture_url} className="w-full h-full object-cover" alt={profile.name} />
                         ) : (
                             <div className="w-full h-full flex items-center justify-center">👤</div>
@@ -339,7 +342,7 @@ function ApplicantCard({ applicantAddress, proposal, price, appliedAt, estimated
                     <span className="text-white">{profile.skills.slice(0, 3).join(", ")}</span>
                 </div>
                 <div className="mt-4 pt-4 border-t border-white/5">
-                    <div className="mb-2"><strong className="text-zinc-500">Proposal:</strong> <p className="mt-1 italic text-zinc-300">"{proposal}"</p></div>
+                    <div className="mb-2"><strong className="text-zinc-500">Proposal:</strong> <p className="mt-1 italic text-zinc-300">&quot;{proposal}&quot;</p></div>
 
                     <div className="bg-black/20 p-3 rounded space-y-2">
                         <div className="flex justify-between items-center px-1">

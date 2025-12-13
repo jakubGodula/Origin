@@ -58,6 +58,7 @@ export function useJobs() {
             }
 
             // 2. Get the object IDs
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const jobIds = jobCreatedEvents.map((event) => (event.parsedJson as any).job_id);
 
             // 3. Fetch the objects to get full details (description, status, etc.)
@@ -69,13 +70,15 @@ export function useJobs() {
             });
 
             // 4. Map to Job interface
-            const jobs = objects.map((obj, index) => {
+            const jobs = objects.map((obj, index) => { // eslint-disable-line @typescript-eslint/no-unused-vars
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 const content = obj.data?.content as any;
                 if (!content || content.dataType !== 'moveObject') return null;
 
                 const fields = content.fields;
 
                 // Parse skills
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 const skills = (fields.required_skills || []).map((s: any) => ({
                     name: s.fields.name,
                     years_experience: s.fields.years_experience
