@@ -2,6 +2,8 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
+import NextImage from 'next/image';
+import { usePathname } from 'next/navigation';
 import { ConnectButton, useSuiClientContext, useCurrentAccount } from '@mysten/dapp-kit';
 import { useIsAdmin } from '@/hooks/useIsAdmin';
 import { useIsSuperAdmin } from '@/hooks/useIsSuperAdmin';
@@ -60,8 +62,13 @@ export const Header: React.FC = () => {
                         onClick={() => setIsPlatformMenuOpen(!isPlatformMenuOpen)}
                         className="flex items-center gap-2 hover:opacity-80 transition-opacity"
                     >
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img src="/logo.png" alt="Origin Logo" className="w-8 h-8 object-contain" />
+                        <NextImage
+                            src="/logo.png"
+                            alt="Origin Logo"
+                            width={32}
+                            height={32}
+                            className="w-8 h-8 object-contain"
+                        />
                         <span className="text-xl font-bold text-white tracking-tight">Origin</span>
                         <ChevronDown className={`w-4 h-4 text-zinc-400 transition-transform ${isPlatformMenuOpen ? 'rotate-180' : ''}`} />
                     </button>
