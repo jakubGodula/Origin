@@ -61,7 +61,48 @@ module origin::reputation {
             skill_counts: vec_map::empty(),
         };
         
-        transfer::transfer(profile, tx_context::sender(ctx));
+        // Share object so others can rate it
+        transfer::share_object(profile);
+    }
+
+    /// Rate multiple skills at once
+    public entry fun rate_skills(
+        profile: &mut ReputationProfile,
+        skills: vector<String>,
+        scores: vector<u8>,
+        _ctx: &mut TxContext
+    ) {
+        let len = vector::length(&skills);
+        assert!(len == vector::length(&scores), 0); // ELengthMismatch
+
+        let mut i = 0;
+        while (i < len) {
+            let skill = *vector::borrow(&skills, i);
+            let score = *vector::borrow(&scores, i);
+            assert!(score >= 1 && score <= 5, 0); // EInvalidScore
+
+            if (!vec_map::contains(&profile.skill_scores, &skill)) {
+                vec_map::insert(&mut profile.skill_scores, skill, 0);
+                vec_map::insert(&mut profile.skill_counts, skill, 0);
+            };
+
+            let current_score = vec_map::get_mut(&mut profile.skill_scores, &skill);
+            *current_score = *current_score + (score as u64);
+
+            let current_count = vec_map::get_mut(&mut profile.skill_counts, &skill);
+            *current_count = *current_count + 1;
+            
+            // Emit event for each skill? Or maybe just one summary? 
+            // For now, emit individual events to match existing pattern.
+            let avg = (*current_score * 100) / *current_count;
+            event::emit(SkillRated {
+                user: profile.user,
+                skill,
+                new_average: avg,
+            });
+
+            i = i + 1;
+        };
     }
 
     public entry fun add_rating(

@@ -8,6 +8,7 @@ import { useState } from "react";
 
 const { networkConfig } = createNetworkConfig({
     testnet: { url: getFullnodeUrl("testnet") },
+    devnet: { url: getFullnodeUrl("devnet") },
 });
 
 // Custom theme with emerald green primary color
