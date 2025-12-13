@@ -6,11 +6,16 @@ interface CandidateCardProps {
     role: string;
     rate: string;
     currency: string;
-    skills: string[];
+    skills: { name: string; rating: number; count: number }[];
     bio: string;
     imageUrl?: string;
     emergencyRate?: string;
     minimalEngagementTime?: string;
+    location?: string;
+    nationalities?: string[];
+    locationPrivate?: boolean;
+    nationalitiesPrivate?: boolean;
+    education?: string;
 }
 
 export const CandidateCard: React.FC<CandidateCardProps> = ({
@@ -22,7 +27,12 @@ export const CandidateCard: React.FC<CandidateCardProps> = ({
     bio,
     imageUrl,
     emergencyRate,
-    minimalEngagementTime
+    minimalEngagementTime,
+    location,
+    nationalities,
+    locationPrivate,
+    nationalitiesPrivate,
+    education
 }) => {
     return (
         <div className="w-full bg-white/5 border border-white/10 rounded-xl p-6 hover:border-primary/50 transition-all duration-300 hover:bg-white/[0.07] group">
@@ -42,11 +52,45 @@ export const CandidateCard: React.FC<CandidateCardProps> = ({
                                     {name}
                                 </h3>
                                 <p className="text-sm text-zinc-400">{role}</p>
+                                {education && (
+                                    <p className="text-xs text-zinc-500 flex items-center gap-1 mt-0.5">
+                                        <span>🎓 {education}</span>
+                                    </p>
+                                )}
                             </div>
                         </div>
                         <span className="text-primary font-mono font-bold text-lg md:hidden">
                             {rate} {currency}/hr
                         </span>
+                    </div>
+
+                    {/* Location & Nationalities (if public) */}
+                    <div className="flex flex-wrap gap-3 mb-3 text-sm text-zinc-400">
+                        {location && !locationPrivate && (
+                            <div className="flex items-center gap-1 bg-white/5 px-2 py-0.5 rounded">
+                                <span>📍 {location}</span>
+                            </div>
+                        )}
+                        {nationalities && nationalities.length > 0 && !nationalitiesPrivate && (
+                            <div className="flex items-center gap-1 bg-white/5 px-2 py-0.5 rounded">
+                                <span>🗺️ {nationalities.join(", ")}</span>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Skills with Ratings */}
+                    <div className="flex flex-wrap gap-2 mb-4">
+                        {skills.map((skill, index) => (
+                            <div key={index} className="flex items-center gap-1.5 bg-white/5 border border-white/10 px-2.5 py-1 rounded-full text-xs transition-colors hover:bg-white/10 hover:border-primary/30">
+                                <span className="text-zinc-200">{skill.name}</span>
+                                {skill.rating > 0 && (
+                                    <span className="flex items-center gap-0.5 text-yellow-400 font-medium bg-yellow-400/10 px-1.5 py-0.5 rounded-[4px] -mr-1">
+                                        <span>★</span>
+                                        {skill.rating.toFixed(1)}
+                                    </span>
+                                )}
+                            </div>
+                        ))}
                     </div>
 
                     <p className="text-zinc-400 mb-4 line-clamp-2 mt-4">

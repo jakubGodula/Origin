@@ -33,9 +33,13 @@ module origin::employer {
         contact_info: vector<ContactItem>,
         owner: address,
         status: u8,
+        verified: bool,
+        verified_by: Option<address>,
+        verified_at: Option<u64>,
+        tax_id: String, 
     }
 
-    // ===== Events =====
+    // ... (events) ...
 
     public struct ProfileCreated has copy, drop {
         profile_id: ID,
@@ -46,6 +50,16 @@ module origin::employer {
     public struct ProfileUpdated has copy, drop {
         profile_id: ID,
         owner: address,
+    }
+
+    public struct EmployerVerified has copy, drop {
+        profile_id: ID,
+        verified_by: address,
+    }
+
+    public struct EmployerUnverified has copy, drop {
+        profile_id: ID,
+        unverified_by: address,
     }
 
     // ===== Public Functions =====
@@ -85,6 +99,7 @@ module origin::employer {
         location: String,
         website: String,
         logo_url: String,
+        tax_id: String, // Renamed from nip
         contact_info_values: vector<String>,
         contact_info_private: vector<bool>,
         ctx: &mut TxContext
@@ -113,6 +128,10 @@ module origin::employer {
             contact_info,
             owner,
             status: STATUS_ACTIVE,
+            verified: false,
+            verified_by: option::none(),
+            verified_at: option::none(),
+            tax_id,
         };
 
         event::emit(ProfileCreated {
@@ -132,6 +151,7 @@ module origin::employer {
         location: String,
         website: String,
         logo_url: String,
+        tax_id: String, // Renamed from nip
         contact_info_values: vector<String>,
         contact_info_private: vector<bool>,
         ctx: &mut TxContext
@@ -154,11 +174,26 @@ module origin::employer {
         profile.website = website;
         profile.logo_url = logo_url;
         profile.contact_info = contact_info;
+        profile.tax_id = tax_id;
 
         event::emit(ProfileUpdated {
             profile_id: object::uid_to_inner(&profile.id),
             owner: profile.owner,
         });
+    }
+
+    // ===== Public Setters for Admin Module =====
+    
+    /// Set verification status (to be called by admin module)
+    public fun set_verified(
+        profile: &mut EmployerProfile,
+        verified: bool,
+        verified_by: Option<address>,
+        verified_at: Option<u64>
+    ) {
+        profile.verified = verified;
+        profile.verified_by = verified_by;
+        profile.verified_at = verified_at;
     }
 
     // ===== Getters =====
@@ -189,5 +224,9 @@ module origin::employer {
 
     public fun get_status(profile: &EmployerProfile): u8 {
         profile.status
+    }
+    
+    public fun get_tax_id(profile: &EmployerProfile): String {
+        profile.tax_id
     }
 }

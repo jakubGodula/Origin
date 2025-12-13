@@ -22,8 +22,14 @@ export interface Job {
     tags: string[];
     postedBy: string;
     postedAt: string;
+    deadline: string; // Added deadline
     status: number;
+    applicantCount: number;
+    job_version: number;
+    language: string; // Added language
 }
+
+import { getRelativeTime } from '@/utils/format';
 
 export function useJobs() {
     const client = useSuiClient();
@@ -31,7 +37,7 @@ export function useJobs() {
     return useQuery({
         queryKey: ['jobs'],
         queryFn: async (): Promise<Job[]> => {
-            // 1. Fetch JobCreated events
+            // 1. Fetch JobCreated events (Note: Filter logic might need better indexing in production)
             const events = await client.queryEvents({
                 query: {
                     MoveModule: {
@@ -69,9 +75,6 @@ export function useJobs() {
 
                 const fields = content.fields;
 
-                // Status 0 = Open
-                if (fields.status !== 0) return null;
-
                 // Parse skills
                 const skills = (fields.required_skills || []).map((s: any) => ({
                     name: s.fields.name,
@@ -93,35 +96,15 @@ export function useJobs() {
                     tags: fields.tags as string[],
                     postedBy: fields.poster,
                     postedAt: getRelativeTime(Number(fields.created_at)),
-                    status: fields.status,
+                    deadline: new Date(Number(fields.deadline)).toLocaleDateString(),
+                    status: Number(fields.status), // Ensure status is valid number
+                    applicantCount: Number(fields.applicant_count || 0),
+                    job_version: Number(fields.job_version || 0),
+                    language: fields.language || 'English', // Map language, default to English if missing (migration safety)
                 };
             }).filter((job): job is Job => job !== null);
 
             return jobs;
         },
     });
-}
-
-function getRelativeTime(timestamp: number): string {
-    const now = Date.now();
-    const diff = now - timestamp;
-
-    // Convert to seconds
-    const seconds = Math.floor(diff / 1000);
-
-    if (seconds < 60) return 'Just now';
-
-    const minutes = Math.floor(seconds / 60);
-    if (minutes < 60) return `${minutes}m ago`;
-
-    const hours = Math.floor(minutes / 60);
-    if (hours < 24) return `${hours}h ago`;
-
-    const days = Math.floor(hours / 24);
-    if (days < 30) return `${days}d ago`;
-
-    const months = Math.floor(days / 30);
-    if (months < 12) return `${months}mo ago`;
-
-    return `${Math.floor(months / 12)}y ago`;
 }

@@ -21,21 +21,29 @@ module origin::candidate_tests {
             candidate::create_profile(
                 string::utf8(b"Alice"),
                 string::utf8(b"Developer"),
-                string::utf8(b"https://alice.dev"),
+                vector[string::utf8(b"https://alice.dev")], // portfolio
                 skills,
                 string::utf8(b"Wonderland"),
-                string::utf8(b"US"),
+                vector[string::utf8(b"US")], // nationalities
                 string::utf8(b"USD"),
                 string::utf8(b"https://alice.dev/pic.jpg"),
                 false,
                 false,
                 contact_info_values,
                 contact_info_private,
-                100,
-                0,
-                false,
-                0,
-                false,
+                vector::empty<string::String>(), // lang names
+                vector::empty<string::String>(), // lang profs
+                vector::empty<string::String>(), // edu inst
+                vector::empty<string::String>(), // edu courses
+                vector::empty<string::String>(), // edu degrees
+                vector::empty<string::String>(), // edu starts
+                vector::empty<string::String>(), // edu ends
+                vector::empty<string::String>(), // cert names
+                vector::empty<string::String>(), // cert links
+                vector::empty<u64>(), // cert dates
+                100, // hourly
+                0, false, 0, false, // rates
+                vector::empty<u8>(), vector::empty<u8>(), vector::empty<u8>(), // hashes
                 ts::ctx(&mut scenario)
             );
         };
@@ -66,21 +74,29 @@ module origin::candidate_tests {
             candidate::create_profile(
                 string::utf8(b"Bob"),
                 string::utf8(b"Builder"),
-                string::utf8(b""),
+                vector[string::utf8(b"")], // portfolio
                 skills,
-                string::utf8(b""),
-                string::utf8(b""),
+                string::utf8(b""), // location
+                vector[string::utf8(b"")], // nationalities
                 string::utf8(b""),
                 string::utf8(b""),
                 false,
                 false,
                 contact_info_values,
                 contact_info_private,
-                50,
-                0,
-                false,
-                0,
-                false,
+                vector::empty<string::String>(), // lang names
+                vector::empty<string::String>(), // lang profs
+                vector::empty<string::String>(), // edu inst
+                vector::empty<string::String>(), // edu courses
+                vector::empty<string::String>(), // edu degrees
+                vector::empty<string::String>(), // edu starts
+                vector::empty<string::String>(), // edu ends
+                vector::empty<string::String>(), // cert names
+                vector::empty<string::String>(), // cert links
+                vector::empty<u64>(), // cert dates
+                50, // hourly
+                0, false, 0, false, // rates
+                vector::empty<u8>(), vector::empty<u8>(), vector::empty<u8>(), // hashes
                 ts::ctx(&mut scenario)
             );
         };

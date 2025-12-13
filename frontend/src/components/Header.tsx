@@ -1,23 +1,89 @@
 "use client";
 
-import React, { useState } from 'react';
-
+import React, { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
-import { ConnectButton, useSuiClientContext } from '@mysten/dapp-kit';
+import { ConnectButton, useSuiClientContext, useCurrentAccount } from '@mysten/dapp-kit';
+import { useIsAdmin } from '@/hooks/useIsAdmin';
+import { useIsSuperAdmin } from '@/hooks/useIsSuperAdmin';
+import { useIsModerator } from '@/hooks/useIsModerator';
+import { useHasPostedJobs } from '@/hooks/useHasPostedJobs';
+import { useEscrows } from '@/hooks/useEscrows';
+import { ChevronDown } from 'lucide-react';
 
 export const Header: React.FC = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [isPlatformMenuOpen, setIsPlatformMenuOpen] = useState(false);
+    const platformMenuRef = useRef<HTMLDivElement>(null);
     const ctx = useSuiClientContext();
+    const account = useCurrentAccount();
+    const { isAdmin } = useIsAdmin();
+    const { isSuperAdmin } = useIsSuperAdmin();
+    const { isModerator } = useIsModerator();
+    const { hasPostedJobs } = useHasPostedJobs();
+    const { data: escrows } = useEscrows();
+
+    const isFreelancer = escrows?.some(e => e.freelancer === account?.address);
+    const isEmployer = hasPostedJobs || escrows?.some(e => e.employer === account?.address);
+
+    // Escrow is visible to: employers, moderators, or admins
+    const showEscrowTab = isEmployer || isModerator || isAdmin || isSuperAdmin;
+    const showMyJobsTab = isFreelancer;
+
+    // specific check for disputes involving the user
+    // The requirement is "active or past".
+    // "Active" = dispute_active is true.
+    const hasActiveDispute = escrows?.some(e => e.dispute_active && (e.employer === account?.address || e.freelancer === account?.address));
+
+    // Explicitly: Visible if (User has active dispute) OR (User is Moderator/Admin)
+    const showDisputeTab = hasActiveDispute || isModerator || isAdmin || isSuperAdmin;
+
+    // Close platform menu on click outside
+    useEffect(() => {
+        function handleClickOutside(event: MouseEvent) {
+            if (platformMenuRef.current && !platformMenuRef.current.contains(event.target as Node)) {
+                setIsPlatformMenuOpen(false);
+            }
+        }
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, []);
 
     return (
         <header className="fixed top-0 left-0 right-0 z-50 border-b border-white/10 bg-black/50 backdrop-blur-md">
             <div className="container mx-auto px-6 h-20 flex items-center justify-between relative">
-                <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-primary-hover opacity-80" />
-                    <span className="text-xl font-bold text-white tracking-tight">Origin</span>
+
+                {/* Platform Selector */}
+                <div className="relative" ref={platformMenuRef}>
+                    <button
+                        onClick={() => setIsPlatformMenuOpen(!isPlatformMenuOpen)}
+                        className="flex items-center gap-2 hover:opacity-80 transition-opacity"
+                    >
+                        <img src="/logo.png" alt="Origin Logo" className="w-8 h-8 object-contain" />
+                        <span className="text-xl font-bold text-white tracking-tight">Origin</span>
+                        <ChevronDown className={`w-4 h-4 text-zinc-400 transition-transform ${isPlatformMenuOpen ? 'rotate-180' : ''}`} />
+                    </button>
+
+                    {isPlatformMenuOpen && (
+                        <div className="absolute top-full left-0 mt-2 w-48 bg-black/90 border border-white/10 rounded-xl backdrop-blur-xl py-2 shadow-xl animate-in fade-in z-50">
+                            <Link
+                                href="/"
+                                className="flex items-center px-4 py-3 text-white hover:bg-white/5 transition-colors"
+                                onClick={() => setIsPlatformMenuOpen(false)}
+                            >
+                                <span className="flex-1">Jobs</span>
+                                <span className="text-xs text-primary bg-primary/10 px-2 py-0.5 rounded ml-2">Current</span>
+                            </Link>
+                            <div className="px-4 py-3 text-zinc-500 cursor-not-allowed flex items-center justify-between">
+                                <span>DEX</span>
+                                <span className="text-[10px] bg-zinc-800 text-zinc-400 px-1.5 py-0.5 rounded">Soon</span>
+                            </div>
+                        </div>
+                    )}
                 </div>
 
-                <nav className="hidden md:flex items-center gap-8">
+                <nav className="hidden md:flex items-center gap-8 px-8">
                     <Link href="/#marketplace" className="text-sm font-medium text-zinc-400 hover:text-white transition-colors">
                         Marketplace
                     </Link>
@@ -27,12 +93,26 @@ export const Header: React.FC = () => {
                     <Link href="/candidates" className="text-sm font-medium text-zinc-400 hover:text-white transition-colors">
                         Candidates
                     </Link>
-                    <Link href="/escrow" className="text-sm font-medium text-zinc-400 hover:text-primary transition-colors">
-                        Escrow
-                    </Link>
-                    <Link href="/dispute" className="text-sm font-medium text-zinc-400 hover:text-primary transition-colors">
-                        Dispute
-                    </Link>
+                    {showMyJobsTab && (
+                        <Link href="/my-jobs" className="text-sm font-medium text-zinc-400 hover:text-primary transition-colors">
+                            My Jobs
+                        </Link>
+                    )}
+                    {showEscrowTab && (
+                        <Link href="/escrow" className="text-sm font-medium text-zinc-400 hover:text-primary transition-colors">
+                            Escrow
+                        </Link>
+                    )}
+                    {(showDisputeTab) && (
+                        <Link href="/dispute" className="text-sm font-medium text-zinc-400 hover:text-primary transition-colors">
+                            Dispute
+                        </Link>
+                    )}
+                    {account && (isAdmin || isSuperAdmin) && (
+                        <Link href="/admin" className="text-sm font-medium text-zinc-400 hover:text-primary transition-colors">
+                            Admin
+                        </Link>
+                    )}
                 </nav>
 
                 {/* Mobile Menu Button */}
@@ -78,20 +158,42 @@ export const Header: React.FC = () => {
                     >
                         Candidates
                     </Link>
-                    <Link
-                        href="/escrow"
-                        className="text-base font-medium text-zinc-400 hover:text-primary transition-colors"
-                        onClick={() => setIsMenuOpen(false)}
-                    >
-                        Escrow
-                    </Link>
-                    <Link
-                        href="/dispute"
-                        className="text-base font-medium text-zinc-400 hover:text-primary transition-colors"
-                        onClick={() => setIsMenuOpen(false)}
-                    >
-                        Dispute
-                    </Link>
+                    {showMyJobsTab && (
+                        <Link
+                            href="/my-jobs"
+                            className="text-base font-medium text-zinc-400 hover:text-primary transition-colors"
+                            onClick={() => setIsMenuOpen(false)}
+                        >
+                            My Jobs
+                        </Link>
+                    )}
+                    {showEscrowTab && (
+                        <Link
+                            href="/escrow"
+                            className="text-base font-medium text-zinc-400 hover:text-primary transition-colors"
+                            onClick={() => setIsMenuOpen(false)}
+                        >
+                            Escrow
+                        </Link>
+                    )}
+                    {showDisputeTab && (
+                        <Link
+                            href="/dispute"
+                            className="text-base font-medium text-zinc-400 hover:text-primary transition-colors"
+                            onClick={() => setIsMenuOpen(false)}
+                        >
+                            Dispute
+                        </Link>
+                    )}
+                    {account && (isAdmin || isSuperAdmin) && (
+                        <Link
+                            href="/admin"
+                            className="text-base font-medium text-zinc-400 hover:text-primary transition-colors"
+                            onClick={() => setIsMenuOpen(false)}
+                        >
+                            Admin
+                        </Link>
+                    )}
                 </div>
             )}
         </header>

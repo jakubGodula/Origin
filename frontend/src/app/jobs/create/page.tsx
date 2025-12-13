@@ -7,7 +7,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useSignAndExecuteTransaction, useCurrentAccount, useSuiClientQuery } from '@mysten/dapp-kit';
 import { Transaction } from '@mysten/sui/transactions';
-import { PACKAGE_ID, MARKETPLACE_ID, MODULE_NAME, CLOCK_ID, EMPLOYER_PROFILE_TYPE } from '@/utils/constants';
+import { PACKAGE_ID, MARKETPLACE_ID, MODULE_NAME, CLOCK_ID, EMPLOYER_PROFILE_TYPE, LANGUAGES } from '@/utils/constants';
 import { EmployerProfile } from '@/types/types';
 
 export default function CreateJobPage() {
@@ -24,6 +24,7 @@ export default function CreateJobPage() {
     const [selectedProfileId, setSelectedProfileId] = useState<string>('');
     const [companyName, setCompanyName] = useState('');
     const [logoUrl, setLogoUrl] = useState('');
+    const [language, setLanguage] = useState('English');
 
     // Fetch Employer Profiles
     const { data: employerProfiles } = useSuiClientQuery(
@@ -115,6 +116,7 @@ export default function CreateJobPage() {
                 tx.pure.bool(locationRequired),
                 tx.pure.vector("u8", new TextEncoder().encode(companyName)), // company_name
                 tx.pure.vector("u8", new TextEncoder().encode(logoUrl)),     // logo_url
+                tx.pure.vector("u8", new TextEncoder().encode(language)),    // language
                 tx.pure.u64(deadline),
                 tx.object(CLOCK_ID),
             ],
@@ -202,6 +204,24 @@ export default function CreateJobPage() {
                                             />
                                         </div>
                                     </div>
+                                </div>
+
+
+
+                                <div>
+                                    <label htmlFor="language" className="block text-sm font-medium text-zinc-300 mb-2">
+                                        Language
+                                    </label>
+                                    <select
+                                        id="language"
+                                        value={language}
+                                        onChange={(e) => setLanguage(e.target.value)}
+                                        className="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all"
+                                    >
+                                        {LANGUAGES.map(lang => (
+                                            <option key={lang} value={lang}>{lang}</option>
+                                        ))}
+                                    </select>
                                 </div>
 
                                 <div>
@@ -375,6 +395,8 @@ export default function CreateJobPage() {
                                     </div>
                                 </div>
 
+
+
                                 <div>
                                     <label htmlFor="tags" className="block text-sm font-medium text-zinc-300 mb-2">
                                         Tags
@@ -406,7 +428,7 @@ export default function CreateJobPage() {
                         )}
                     </div>
                 </div>
-            </main>
-        </div>
+            </main >
+        </div >
     );
 }

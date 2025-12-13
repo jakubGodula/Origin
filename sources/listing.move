@@ -61,13 +61,15 @@ module origin::listing {
         company_name: String,
         logo_url: String,
         currency: String,  // "SUI" initially
+        language: String,  // Added language field
         deadline: u64,     // timestamp
         status: u8,        // 0=Open, 1=InProgress, 2=Completed, 3=Cancelled
-        applicants: Table<address, bool>, // Track applicants to prevent duplicates
+        applicants: Table<address, u64>, // Track applicants by job_version they applied to
         applicant_count: u64,
         selected_freelancer: Option<address>,
         created_at: u64,
         escrow_id: Option<ID>,
+        job_version: u64, // Version tracker for job updates
     }
 
     /// Job application
@@ -79,6 +81,7 @@ module origin::listing {
         proposed_price: u64,
         estimated_delivery: u64,
         applied_at: u64,
+        job_version: u64, // Version of the job applied to
     }
 
     // ===== Events =====
@@ -88,6 +91,7 @@ module origin::listing {
         poster: address,
         budget: u64,
         title: String,
+        language: String, // Added to event for easier indexing
     }
 
     public struct JobApplicationSubmitted has copy, drop {
@@ -95,6 +99,7 @@ module origin::listing {
         application_id: ID,
         applicant: address,
         proposal: String,
+        job_version: u64,
     }
 
     public struct FreelancerSelected has copy, drop {
@@ -127,6 +132,7 @@ module origin::listing {
         location_required: bool,
         company_name: vector<u8>,
         logo_url: vector<u8>,
+        language: vector<u8>, // Added language argument
         deadline: u64,
         clock: &Clock,
         ctx: &mut TxContext
@@ -176,6 +182,7 @@ module origin::listing {
             company_name: string::utf8(company_name),
             logo_url: string::utf8(logo_url),
             currency: string::utf8(b"SUI"),
+            language: string::utf8(language), // Store language
             deadline,
             status: STATUS_OPEN,
             applicants: table::new(ctx),
@@ -183,6 +190,7 @@ module origin::listing {
             selected_freelancer: option::none(),
             created_at: clock::timestamp_ms(clock),
             escrow_id: option::none(),
+            job_version: 0,
         };
         
         marketplace::increment_jobs(marketplace);
@@ -192,14 +200,20 @@ module origin::listing {
             poster: tx_context::sender(ctx),
             budget,
             title: string::utf8(title),
+            language: string::utf8(language),
         });
         
         transfer::share_object(job);
     }
 
+    use origin::candidate; // Added import
+
+    // ...
+
     /// Apply to a job
     public entry fun apply_to_job(
         job: &mut Listing,
+        _candidate_profile: &candidate::CandidateProfile, // Enforce candidate profile ownership
         proposal: vector<u8>,
         proposed_price: u64,
         estimated_delivery: u64,
@@ -209,9 +223,19 @@ module origin::listing {
         assert!(job.status == STATUS_OPEN, EJobNotOpen);
         
         let applicant = tx_context::sender(ctx);
-        assert!(!table::contains(&job.applicants, applicant), EAlreadyApplied);
         
-        table::add(&mut job.applicants, applicant, true);
+        // Check if already applied TO THE CURRENT VERSION
+        if (table::contains(&job.applicants, applicant)) {
+            let last_version = *table::borrow(&job.applicants, applicant);
+            assert!(last_version < job.job_version, EAlreadyApplied);
+            // Update the version they applied to
+            let stored_version = table::borrow_mut(&mut job.applicants, applicant);
+            *stored_version = job.job_version;
+        } else {
+            // First time applying
+            table::add(&mut job.applicants, applicant, job.job_version);
+        };
+        
         job.applicant_count = job.applicant_count + 1;
         
         let application_id = object::new(ctx);
@@ -225,6 +249,7 @@ module origin::listing {
             proposed_price,
             estimated_delivery,
             applied_at: clock::timestamp_ms(clock),
+            job_version: job.job_version,
         };
         
         event::emit(JobApplicationSubmitted {
@@ -232,6 +257,7 @@ module origin::listing {
             application_id: application_uid,
             applicant,
             proposal: string::utf8(proposal),
+            job_version: job.job_version,
         });
         
         transfer::transfer(application, job.poster);
@@ -266,6 +292,53 @@ module origin::listing {
         job.status = STATUS_CANCELLED;
     }
 
+    /// Complete job (package only, called by escrow)
+    public(package) fun complete_job(
+        job: &mut Listing
+    ) {
+        // We don't assert status here because it might be "In Progress" or even "Disputed" (handled by escrow logic)
+        job.status = STATUS_COMPLETED;
+    }
+
+    /// Update job details (poster only, only if open)
+    /// WARNING: Resets applicant count to 0 and increments job version.
+    /// Previous applicants can re-apply to the new version.
+    public entry fun update_job(
+        job: &mut Listing,
+        title: vector<u8>,
+        description: vector<u8>,
+        details: vector<u8>,
+        budget: u64,
+        payment_type: u8,
+        duration_value: u64,
+        duration_unit: u8,
+        location: vector<u8>,
+        location_required: bool,
+        language: vector<u8>, // Added language argument
+        deadline: u64,
+        ctx: &mut TxContext
+    ) {
+        assert!(tx_context::sender(ctx) == job.poster, ENotJobPoster);
+        assert!(job.status == STATUS_OPEN, EJobAlreadyClosed);
+        assert!(budget > 0, EInvalidBudget);
+
+        job.title = string::utf8(title);
+        job.description = string::utf8(description);
+        job.details = string::utf8(details);
+        job.budget = budget;
+        job.payment_type = payment_type;
+        job.duration_value = duration_value;
+        job.duration_unit = duration_unit;
+        job.location = string::utf8(location);
+        job.location_required = location_required;
+        job.language = string::utf8(language); // Update language
+        job.deadline = deadline;
+        
+        // Reset applicant count and increment version
+        job.applicant_count = 0;
+        job.job_version = job.job_version + 1;
+    }
+
     // ===== Getters =====
     
     public fun get_status(job: &Listing): u8 {
@@ -282,5 +355,13 @@ module origin::listing {
     
     public fun get_applicant_count(job: &Listing): u64 {
         job.applicant_count
+    }
+    
+    public fun get_job_version(job: &Listing): u64 {
+        job.job_version
+    }
+
+    public fun get_language(job: &Listing): String {
+        job.language
     }
 }
