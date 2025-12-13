@@ -63,7 +63,7 @@ export const Header: React.FC = () => {
                         className="flex items-center gap-2 hover:opacity-80 transition-opacity"
                     >
                         <NextImage
-                            src="/logo.png"
+                            src={`${process.env.NEXT_PUBLIC_BASE_PATH || ''}/logo.png`}
                             alt="Origin Logo"
                             width={32}
                             height={32}
