@@ -261,7 +261,6 @@ function ApplicantCard({ applicantAddress, proposal, price, appliedAt, estimated
     );
 
     const profile = profileData?.data?.[0]?.data?.content?.dataType === 'moveObject'
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         ? (profileData.data[0].data.content.fields as unknown as CandidateProfile)
         : null;
 

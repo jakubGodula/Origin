@@ -6,10 +6,9 @@ import { useJobs } from '@/hooks/useJobs';
 import { Header } from '@/components/Header';
 import { Button } from '@/components/Button';
 import { useState } from 'react';
-import { getRelativeTime } from '@/utils/format';
 import { uploadToWalrus, getWalrusBlobUrl } from '@/utils/walrus';
 import { Transaction } from '@mysten/sui/transactions';
-import { PACKAGE_ID, ESCROW_MODULE, CLOCK_ID } from '@/utils/constants';
+import { PACKAGE_ID, ESCROW_MODULE } from '@/utils/constants';
 import Link from 'next/link';
 import { EmployerDisplay } from '@/components/EmployerDisplay';
 
@@ -50,7 +49,6 @@ export default function DashboardPage() {
         return e.employer === account.address || e.freelancer === account.address;
     });
 
-    const hiredJobs = myEscrows.filter(e => e.employer === account?.address);
     const [filterStatus, setFilterStatus] = useState<'active' | 'history'>('active');
 
     const workingJobs = myEscrows.filter(e => e.freelancer === account?.address)
@@ -109,9 +107,10 @@ export default function DashboardPage() {
                 }
             );
 
-        } catch (err: any) {
+        } catch (err: unknown) {
             console.error("Error in work submission flow:", err);
-            alert(`Error: ${err.message}`);
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            alert(`Error: ${(err as any).message}`);
         } finally {
             setUploading(false);
         }
@@ -142,7 +141,7 @@ export default function DashboardPage() {
                     <section className="mb-12">
                         <div className="flex justify-between items-center mb-6">
                             <h2 className="text-2xl font-bold text-white flex items-center gap-2">
-                                👨‍💻 Jobs I'm Working On
+                                👨‍💻 Jobs I&apos;m Working On
                                 <span className="text-sm font-normal text-zinc-500 ml-2">({workingJobs.length})</span>
                             </h2>
                             <div className="flex bg-white/5 rounded-lg p-1 border border-white/10">

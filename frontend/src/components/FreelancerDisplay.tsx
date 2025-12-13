@@ -1,6 +1,6 @@
 import React from 'react';
 import { useSuiClientQuery } from '@mysten/dapp-kit';
-import { PACKAGE_ID, CANDIDATE_PROFILE_TYPE } from '@/utils/constants';
+import { CANDIDATE_PROFILE_TYPE } from '@/utils/constants';
 import Link from 'next/link';
 
 interface FreelancerDisplayProps {
@@ -20,6 +20,7 @@ export function FreelancerDisplay({ address, showLink = true }: FreelancerDispla
 
     const profileId = profileData?.data?.[0]?.data?.objectId;
     const profile = profileData?.data?.[0]?.data?.content?.dataType === 'moveObject'
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         ? (profileData.data[0].data.content.fields as any)
         : null;
 

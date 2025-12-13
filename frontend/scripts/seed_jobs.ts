@@ -2,7 +2,6 @@ import { SuiClient, getFullnodeUrl } from '@mysten/sui/client';
 import { Transaction } from '@mysten/sui/transactions';
 import { Ed25519Keypair } from '@mysten/sui/keypairs/ed25519';
 import { fromB64 } from '@mysten/sui/utils';
-import { execSync } from 'child_process';
 import fs from 'fs';
 import path from 'path';
 
@@ -122,9 +121,9 @@ async function main() {
                 tx.pure.string(job.title),
                 tx.pure.string(job.description),
                 tx.pure.string(job.details),
-                tx.pure.vector("vector<u8>", job.skills.map(s => new TextEncoder().encode(s.name))),
-                tx.pure.vector("u8", job.skills.map(s => s.years)),
-                tx.pure.vector("vector<u8>", job.tags.map(tag => new TextEncoder().encode(tag))),
+                tx.pure.vector("vector<u8>", job.skills.map(s => Array.from(new TextEncoder().encode(s.name)))),
+                tx.pure.vector("u64", job.skills.map(s => s.years)),
+                tx.pure.vector("vector<u8>", job.tags.map(tag => Array.from(new TextEncoder().encode(tag)))),
                 tx.pure.u64(budgetMIST),
                 tx.pure.u8(job.paymentType),
                 tx.pure.u64(job.durationValue),

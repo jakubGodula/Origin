@@ -56,6 +56,7 @@ export function useIsSuperAdmin() {
                         });
 
                         if (marketplaceObj.data?.content?.dataType === 'moveObject') {
+                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
                             const fields = marketplaceObj.data.content.fields as any;
                             const primaryAdmin = fields?.admin;
                             const isSuperAdminFallback = account.address === primaryAdmin;

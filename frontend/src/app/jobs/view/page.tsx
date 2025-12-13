@@ -63,6 +63,7 @@ function JobDetailsContent() {
     const jobApplications = (applicationsData?.data || [])
         .map(obj => {
             if (obj.data?.content?.dataType === 'moveObject') {
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 return obj.data.content.fields as any;
             }
             return null;
