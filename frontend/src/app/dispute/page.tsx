@@ -1,7 +1,6 @@
 "use client";
 
-import { useCurrentAccount, useSuiClient, useSignAndExecuteTransaction } from '@mysten/dapp-kit';
-import { useRouter } from 'next/navigation';
+import { useCurrentAccount, useSignAndExecuteTransaction } from '@mysten/dapp-kit';
 import { Header } from '@/components/Header';
 import { Button } from '@/components/Button';
 import { useEscrows, Escrow } from '@/hooks/useEscrows';
@@ -10,12 +9,11 @@ import { useState } from 'react';
 import { PACKAGE_ID, ESCROW_MODULE, MARKETPLACE_ID } from '@/utils/constants';
 import { Transaction } from '@mysten/sui/transactions';
 import Link from 'next/link';
-import { AlertCircle, CheckCircle, Scale, Shield, Filter } from 'lucide-react';
+import { AlertCircle, CheckCircle, Scale, Shield } from 'lucide-react';
 
 // Unified Dispute Resolution Page
 export default function DisputePage() {
     const account = useCurrentAccount();
-    const router = useRouter();
     const { mutate: signAndExecuteTransaction } = useSignAndExecuteTransaction();
 
     // Roles
@@ -184,8 +182,8 @@ export default function DisputePage() {
                                         key={escrow.id}
                                         onClick={() => setSelectedEscrow(escrow)}
                                         className={`p-4 rounded-xl border cursor-pointer transition-all ${selectedEscrow?.id === escrow.id
-                                                ? 'bg-primary/10 border-primary'
-                                                : 'bg-white/5 border-white/10 hover:border-white/20'
+                                            ? 'bg-primary/10 border-primary'
+                                            : 'bg-white/5 border-white/10 hover:border-white/20'
                                             }`}
                                     >
                                         <div className="flex justify-between items-start mb-2">

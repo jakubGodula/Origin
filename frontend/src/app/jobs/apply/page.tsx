@@ -8,7 +8,7 @@ import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useCurrentAccount, useSuiClientQuery, useSignAndExecuteTransaction } from '@mysten/dapp-kit';
 import { Transaction } from '@mysten/sui/transactions';
-import { CANDIDATE_PROFILE_TYPE, PACKAGE_ID, MODULE_NAME, CLOCK_ID } from '@/utils/constants';
+import { CANDIDATE_PROFILE_TYPE, PACKAGE_ID, CLOCK_ID } from '@/utils/constants';
 import { CandidateProfile } from '@/types/types';
 
 function JobApplicationContent() {
@@ -77,12 +77,14 @@ function JobApplicationContent() {
                 // Extract email from contact info
                 // Defensively handle potential struct wrapping in JSON response
                 const emailEntry = profile.contact_info.find(c => {
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
                     const val = (c as any).value || (c as any).fields?.value;
                     return val && typeof val === 'string' && val.toLowerCase().startsWith('email:');
                 });
 
                 let email = '';
                 if (emailEntry) {
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
                     const val = (emailEntry as any).value || (emailEntry as any).fields?.value;
                     email = val ? val.split(':')[1].trim() : '';
                 }

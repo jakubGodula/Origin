@@ -37,8 +37,8 @@ export function EditJobClient() {
     const [isMounted, setIsMounted] = useState(false);
 
     useEffect(() => {
-        setIsMounted(true);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
+        const timer = setTimeout(() => setIsMounted(true), 0);
+        return () => clearTimeout(timer);
     }, []);
 
     // Fetch Job Data
@@ -62,37 +62,39 @@ export function EditJobClient() {
             // But here we want to populate the form.
             // Using a timeout can sometimes bypass the synchronous check, but better to just suppress if we know it's one-off.
             // However, since we depend on jobData, meaningful changes to jobData trigger this.
+            const timer = setTimeout(() => {
+                setTitle(fields.title);
+                setDescription(fields.description);
+                setDetails(fields.details);
+                setPrice((Number(fields.budget) / 1_000_000_000).toString());
+                setPaymentType(String(fields.payment_type));
+                setDurationValue(String(fields.duration_value));
+                setDurationUnit(String(fields.duration_unit));
+                setLocation(fields.location);
+                setLocationRequired(fields.location_required);
 
-            setTitle(fields.title);
-            setDescription(fields.description);
-            setDetails(fields.details);
-            setPrice((Number(fields.budget) / 1_000_000_000).toString());
-            setPaymentType(String(fields.payment_type));
-            setDurationValue(String(fields.duration_value));
-            setDurationUnit(String(fields.duration_unit));
-            setLocation(fields.location);
-            setLocationRequired(fields.location_required);
+                if (Array.isArray(fields.tags)) {
+                    setTags(fields.tags.join(', '));
+                }
 
-            if (Array.isArray(fields.tags)) {
-                setTags(fields.tags.join(', '));
-            }
-
-            if (Array.isArray(fields.required_skills)) {
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                const loadedSkills = fields.required_skills.map((s: any) => ({
-                    name: s.fields.name,
-                    years: s.fields.years_experience
-                }));
-                setSkills(loadedSkills);
-            }
-            setIsFetching(false);
+                if (Array.isArray(fields.required_skills)) {
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    const loadedSkills = fields.required_skills.map((s: any) => ({
+                        name: s.fields.name,
+                        years: s.fields.years_experience
+                    }));
+                    setSkills(loadedSkills);
+                }
+                setIsFetching(false);
+            }, 0);
+            return () => clearTimeout(timer);
         } else if (error) {
             alert("Error loading job details.");
             router.push('/#marketplace');
         } else if (!jobLoading && !jobData?.data) {
-            setIsFetching(false);
+            const timer = setTimeout(() => setIsFetching(false), 0);
+            return () => clearTimeout(timer);
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [jobData, error, jobLoading, id, router]);
 
     const handleSubmit = async (e: React.FormEvent) => {

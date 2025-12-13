@@ -42,6 +42,7 @@ export const CandidateCard: React.FC<CandidateCardProps> = ({
                         <div className="flex items-center gap-4">
                             <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-primary-hover flex items-center justify-center text-white font-bold text-xl overflow-hidden">
                                 {imageUrl ? (
+                                    // eslint-disable-next-line @next/next/no-img-element
                                     <img src={imageUrl} alt={name} className="w-full h-full object-cover" />
                                 ) : (
                                     name.charAt(0)

@@ -1,6 +1,6 @@
 import React from 'react';
 import { useSuiClientQuery } from '@mysten/dapp-kit';
-import { PACKAGE_ID, EMPLOYER_PROFILE_TYPE } from '@/utils/constants';
+import { EMPLOYER_PROFILE_TYPE } from '@/utils/constants';
 import Link from 'next/link';
 
 interface EmployerDisplayProps {
@@ -20,6 +20,7 @@ export function EmployerDisplay({ address, showLink = true }: EmployerDisplayPro
 
     const profileId = profileData?.data?.[0]?.data?.objectId;
     const profile = profileData?.data?.[0]?.data?.content?.dataType === 'moveObject'
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         ? (profileData.data[0].data.content.fields as any)
         : null;
 

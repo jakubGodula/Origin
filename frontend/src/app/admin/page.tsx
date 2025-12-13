@@ -851,7 +851,7 @@ export default function AdminPage() {
                         <div className="bg-primary/10 border border-primary/30 rounded-xl p-6 mb-8">
                             <h2 className="text-xl font-bold text-primary mb-2">Promote Admin to Super Admin</h2>
                             <p className="text-zinc-400 text-sm mb-4">
-                                Promote any address to super admin status. Multiple super admins provide redundancy and avoid the "bus factor".
+                                Promote any address to super admin status. Multiple super admins provide redundancy and avoid the &quot;bus factor&quot;.
                             </p>
 
                             <div className="flex gap-4">

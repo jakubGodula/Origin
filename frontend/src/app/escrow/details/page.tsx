@@ -8,7 +8,6 @@ import { ProfileLink } from '@/components/ProfileLink';
 import { getWalrusBlobUrl } from '@/utils/walrus';
 import { useJobs } from '@/hooks/useJobs';
 import { ArrowLeft, ExternalLink, User, Briefcase, Coins } from 'lucide-react';
-import Link from 'next/link';
 import { Suspense } from 'react';
 import { Transaction } from '@mysten/sui/transactions';
 import { PACKAGE_ID, ESCROW_MODULE, MARKETPLACE_ID } from '@/utils/constants';
@@ -68,9 +67,10 @@ function EscrowDetailsContent() {
                 }
             );
 
-        } catch (err: any) {
+        } catch (err: unknown) {
             console.error("Error in work submission flow:", err);
-            alert(`Error: ${err.message}`);
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            alert(`Error: ${(err as any).message}`);
         } finally {
             setUploading(false);
         }
