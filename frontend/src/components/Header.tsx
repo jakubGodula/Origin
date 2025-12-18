@@ -101,6 +101,9 @@ export const Header: React.FC = () => {
                     <Link href="/candidates" className="text-sm font-medium text-zinc-400 hover:text-white transition-colors">
                         Candidates
                     </Link>
+                    <Link href="/founders" className="text-sm font-medium text-zinc-400 hover:text-white transition-colors">
+                        Founders
+                    </Link>
                     {showMyJobsTab && (
                         <Link href="/my-jobs" className="text-sm font-medium text-zinc-400 hover:text-primary transition-colors">
                             My Jobs
@@ -165,6 +168,13 @@ export const Header: React.FC = () => {
                         onClick={() => setIsMenuOpen(false)}
                     >
                         Candidates
+                    </Link>
+                    <Link
+                        href="/founders"
+                        className="text-base font-medium text-zinc-400 hover:text-white transition-colors"
+                        onClick={() => setIsMenuOpen(false)}
+                    >
+                        Founders
                     </Link>
                     {showMyJobsTab && (
                         <Link
