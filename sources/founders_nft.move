@@ -28,6 +28,7 @@ module origin::founders_nft {
         tier1_minted: u64,
         tier2_minted: u64,
         tier3_minted: u64,
+        next_founder_id: u64,
     }
 
     // ===== Events =====
@@ -48,6 +49,7 @@ module origin::founders_nft {
             tier1_minted: 0,
             tier2_minted: 0,
             tier3_minted: 0,
+            next_founder_id: 1,
         };
         transfer::share_object(info);
     }
@@ -55,25 +57,37 @@ module origin::founders_nft {
     /// Mint a new Founders NFT
     public entry fun mint(
         info: &mut CollectionInfo,
-        name: vector<u8>,
-        description: vector<u8>,
-        url: vector<u8>,
         tier: u8,
-        founder_id: u64,
         ctx: &mut TxContext
     ) {
         let sender = tx_context::sender(ctx);
+        let founder_id = info.next_founder_id;
+        info.next_founder_id = info.next_founder_id + 1;
         
-        // Check supply limits based on tier
-        if (tier == 1) {
+        let (name, description, url_bytes) = if (tier == 1) {
             assert!(info.tier1_minted < MAX_TIER_1, ETierFull);
             info.tier1_minted = info.tier1_minted + 1;
+            (
+                b"Origin Founder NFT",
+                b"The ultimate founder status. Only one can be the Visionary.",
+                b"https://raw.githubusercontent.com/jakubGodula/Origin/1579a1553d79bd0e852318b210d987bb36a1cfa1/frontend/public/nfts/tier1_official.png"
+            )
         } else if (tier == 2) {
             assert!(info.tier2_minted < MAX_TIER_2, ETierFull);
             info.tier2_minted = info.tier2_minted + 1;
+            (
+                b"Origin Founder NFT",
+                b"A vibrant and iridescent reflection of pioneering spirit.",
+                b"https://raw.githubusercontent.com/jakubGodula/Origin/1579a1553d79bd0e852318b210d987bb36a1cfa1/frontend/public/nfts/tier2_official.png"
+            )
         } else if (tier == 3) {
             assert!(info.tier3_minted < MAX_TIER_3, ETierFull);
             info.tier3_minted = info.tier3_minted + 1;
+            (
+                b"Origin Founder NFT",
+                b"Sharp, technological foundation for the first believers.",
+                b"https://raw.githubusercontent.com/jakubGodula/Origin/1579a1553d79bd0e852318b210d987bb36a1cfa1/frontend/public/nfts/tier3_official.png"
+            )
         } else {
             abort EInvalidTier
         };
@@ -82,7 +96,7 @@ module origin::founders_nft {
             id: object::new(ctx),
             name: string::utf8(name),
             description: string::utf8(description),
-            url: url::new_unsafe_from_bytes(url),
+            url: url::new_unsafe_from_bytes(url_bytes),
             tier,
             founder_id,
         };
@@ -95,15 +109,6 @@ module origin::founders_nft {
         });
 
         transfer::public_transfer(nft, sender);
-    }
-
-    /// Update the NFT description
-    public entry fun update_description(
-        nft: &mut FoundersNFT,
-        new_description: vector<u8>,
-        _: &mut TxContext
-    ) {
-        nft.description = string::utf8(new_description);
     }
 
     /// Burn the NFT

@@ -16,7 +16,7 @@ const TIERS = [
         name: "Tier 1: Visionary",
         maxSupply: 1,
         price: "USDC based",
-        defaultImage: "/nfts/tier1_official.png",
+        defaultImage: "https://raw.githubusercontent.com/jakubGodula/Origin/1579a1553d79bd0e852318b210d987bb36a1cfa1/frontend/public/nfts/tier1_official.png",
         description: "The ultimate founder status. Only one can be the Visionary."
     },
     {
@@ -24,7 +24,7 @@ const TIERS = [
         name: "Tier 2: Pioneer",
         maxSupply: 10,
         price: "USDC based",
-        defaultImage: "/nfts/tier2_official.png",
+        defaultImage: "https://raw.githubusercontent.com/jakubGodula/Origin/1579a1553d79bd0e852318b210d987bb36a1cfa1/frontend/public/nfts/tier2_official.png",
         description: "A vibrant and iridescent reflection of pioneering spirit."
     },
     {
@@ -32,7 +32,7 @@ const TIERS = [
         name: "Tier 3: Early Adopter",
         maxSupply: 100,
         price: "USDC based",
-        defaultImage: "/nfts/tier3_official.png",
+        defaultImage: "https://raw.githubusercontent.com/jakubGodula/Origin/1579a1553d79bd0e852318b210d987bb36a1cfa1/frontend/public/nfts/tier3_official.png",
         description: "Sharp, technological foundation for the first believers."
     },
 ];
@@ -45,8 +45,7 @@ export default function FoundersPage() {
     const [formData, setFormData] = useState({
         name: "Origin Founder NFT",
         description: TIERS[2].description,
-        url: TIERS[2].defaultImage,
-        founderId: "1"
+        url: TIERS[2].defaultImage
     });
 
     // Update form when tier changes
@@ -80,11 +79,7 @@ export default function FoundersPage() {
                 target: `${PACKAGE_ID}::${MODULE_NAME}::mint`,
                 arguments: [
                     tx.object(COLLECTION_INFO_ID),
-                    tx.pure.string(formData.name),
-                    tx.pure.string(formData.description),
-                    tx.pure.string(formData.url),
                     tx.pure.u8(selectedTier),
-                    tx.pure.u64(BigInt(formData.founderId)),
                 ],
             });
 
@@ -154,8 +149,8 @@ export default function FoundersPage() {
                                 <input
                                     id="name"
                                     value={formData.name}
-                                    onChange={handleInputChange}
-                                    className="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-3 text-white placeholder:text-zinc-600 focus:outline-none focus:border-primary/50 transition-all"
+                                    readOnly
+                                    className="w-full bg-white/5 border border-white/5 rounded-lg px-4 py-3 text-zinc-500 cursor-not-allowed focus:outline-none transition-all"
                                     required
                                 />
                             </div>
@@ -165,35 +160,22 @@ export default function FoundersPage() {
                                 <textarea
                                     id="description"
                                     value={formData.description}
-                                    onChange={handleInputChange}
+                                    readOnly
                                     rows={3}
-                                    className="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-3 text-white placeholder:text-zinc-600 focus:outline-none focus:border-primary/50 transition-all resize-none"
+                                    className="w-full bg-white/5 border border-white/5 rounded-lg px-4 py-3 text-zinc-500 cursor-not-allowed focus:outline-none transition-all resize-none"
                                     required
                                 />
                             </div>
 
-                            <div className="grid grid-cols-2 gap-4">
-                                <div className="grid gap-2">
-                                    <label htmlFor="founderId" className="block text-sm font-medium text-zinc-300">Founder ID</label>
-                                    <input
-                                        id="founderId"
-                                        type="number"
-                                        value={formData.founderId}
-                                        onChange={handleInputChange}
-                                        className="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-3 text-white placeholder:text-zinc-600 focus:outline-none focus:border-primary/50 transition-all"
-                                        required
-                                    />
-                                </div>
-                                <div className="grid gap-2">
-                                    <label htmlFor="url" className="block text-sm font-medium text-zinc-300">Metadata URL</label>
-                                    <input
-                                        id="url"
-                                        value={formData.url}
-                                        onChange={handleInputChange}
-                                        className="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-3 text-white placeholder:text-zinc-600 focus:outline-none focus:border-primary/50 transition-all"
-                                        required
-                                    />
-                                </div>
+                            <div className="grid gap-2">
+                                <label htmlFor="url" className="block text-sm font-medium text-zinc-300">Metadata URL</label>
+                                <input
+                                    id="url"
+                                    value={formData.url}
+                                    readOnly
+                                    className="w-full bg-white/5 border border-white/5 rounded-lg px-4 py-3 text-zinc-500 cursor-not-allowed focus:outline-none transition-all"
+                                    required
+                                />
                             </div>
                         </div>
 
@@ -224,7 +206,7 @@ export default function FoundersPage() {
                                 <div className={`text-[10px] font-black uppercase tracking-[0.2em] px-2 py-1 rounded bg-black/40 backdrop-blur-md text-white border border-white/10`}>
                                     Origin Founder
                                 </div>
-                                <div className="text-xs font-mono text-zinc-500 bg-black/40 px-2 py-1 rounded backdrop-blur-sm border border-white/5">#{formData.founderId}</div>
+                                <div className="text-xs font-mono text-zinc-500 bg-black/40 px-2 py-1 rounded backdrop-blur-sm border border-white/5">#TBA</div>
                             </div>
 
                             {/* Image/Art */}
