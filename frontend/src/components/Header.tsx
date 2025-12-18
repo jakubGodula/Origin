@@ -83,10 +83,14 @@ export const Header: React.FC = () => {
                                 <span className="flex-1">Jobs</span>
                                 <span className="text-xs text-primary bg-primary/10 px-2 py-0.5 rounded ml-2">Current</span>
                             </Link>
-                            <div className="px-4 py-3 text-zinc-500 cursor-not-allowed flex items-center justify-between">
-                                <span>DEX</span>
-                                <span className="text-[10px] bg-zinc-800 text-zinc-400 px-1.5 py-0.5 rounded">Soon</span>
-                            </div>
+                            <Link
+                                href="/dex"
+                                className="flex items-center px-4 py-3 text-white hover:bg-white/5 transition-colors"
+                                onClick={() => setIsPlatformMenuOpen(false)}
+                            >
+                                <span className="flex-1">DEX</span>
+                                <span className="text-[10px] bg-green-500/10 text-green-500 px-1.5 py-0.5 rounded ml-2">New</span>
+                            </Link>
                         </div>
                     )}
                 </div>
@@ -100,6 +104,9 @@ export const Header: React.FC = () => {
                     </Link>
                     <Link href="/candidates" className="text-sm font-medium text-zinc-400 hover:text-white transition-colors">
                         Candidates
+                    </Link>
+                    <Link href="/dex" className="text-sm font-medium text-zinc-400 hover:text-white transition-colors">
+                        DEX
                     </Link>
                     {showMyJobsTab && (
                         <Link href="/my-jobs" className="text-sm font-medium text-zinc-400 hover:text-primary transition-colors">
