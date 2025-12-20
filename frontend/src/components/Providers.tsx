@@ -7,9 +7,11 @@ import { useState } from "react";
 
 
 const { networkConfig } = createNetworkConfig({
+    mainnet: { url: getFullnodeUrl("mainnet") },
     testnet: { url: getFullnodeUrl("testnet") },
     devnet: { url: getFullnodeUrl("devnet") },
 });
+
 
 // Custom theme with emerald green primary color
 const customTheme = {
@@ -76,9 +78,15 @@ export function Providers({ children }: { children: React.ReactNode }) {
     return (
         <QueryClientProvider client={queryClient}>
             <SuiClientProvider networks={networkConfig} defaultNetwork="testnet">
-                <WalletProvider autoConnect theme={customTheme}>
+                <WalletProvider
+                    autoConnect={false}
+                    theme={customTheme}
+                    preferredWallets={['Slush']}
+                >
+
                     {children}
                 </WalletProvider>
+
             </SuiClientProvider>
         </QueryClientProvider>
     );
