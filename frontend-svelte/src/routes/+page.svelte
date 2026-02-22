@@ -12,11 +12,10 @@
 
   function registerEmployee() {
     if (!validatePhone()) {
-      phoneError = "Phone must be 9–15 digits";
+      phoneError = "Phone must be 9-15 digits";
       return;
     }
 
-    phoneError = "";
     console.log({ name, address, email, phone });
   }
 </script>
