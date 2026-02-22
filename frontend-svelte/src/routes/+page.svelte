@@ -25,22 +25,22 @@
   <h2>Employee registration</h2>
 
   <form on:submit|preventDefault={registerEmployee}>
-    <input class="cell" placeholder="Name" bind:value={name} required />
-    <input class="cell" placeholder="Address" bind:value={address} required />
+    <input class="input" placeholder="Name" bind:value={name} required />
+    <input class="input" placeholder="Address" bind:value={address} required />
 
-    <input class="cell" placeholder="Phone" bind:value={phone} required />
+    <input class="input" placeholder="Phone" bind:value={phone} required />
     {#if phoneError}
       <p class="error">{phoneError}</p>
     {/if}
 
     <input
-      class="cell"
+      class="input"
       placeholder="Email"
       type="email"
       bind:value={email}
       required
     />
 
-    <button class="cell button" type="submit">Register</button>
+    <button class="button" type="submit">Register</button>
   </form>
 </div>
