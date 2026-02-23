@@ -9,4 +9,17 @@
   <link rel="icon" href={favicon} />
 </svelte:head>
 
-{@render children()}
+<div>
+  <nav class="navbar">
+    <div class="logo">JOB MARKETPLACE</div>
+
+    <div class="nav-links">
+      <a href="/jobs">Job Offers</a>
+      <a href="/post-job">Post a Job</a>
+    </div>
+  </nav>
+
+  <main class="content">
+    {@render children()}
+  </main>
+</div>
