@@ -11,11 +11,14 @@
 
   {#each $jobs as job}
     <div class="job-card">
-      <h3>{job.title}</h3>
+      <h3>
+        <a href={`/jobs/${job.id}`} class="job-link">
+          {job.title}
+        </a>
+      </h3>
       <p><strong>Company:</strong> {job.company}</p>
       <p><strong>Location:</strong> {job.location}</p>
       <p><strong>Salary:</strong> {job.salary}</p>
-      <button class="button small">Apply</button>
     </div>
   {/each}
 </div>
