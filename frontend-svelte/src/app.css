@@ -13,7 +13,7 @@ body {
 }
 
 .container {
-  max-width: 400px;
+  max-width: 500px;
   margin: 0 auto;
   padding: 24px;
   border-radius: 12px;
@@ -66,6 +66,11 @@ form {
 
 .button:active {
   opacity: 0.9;
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 .error {
@@ -142,4 +147,13 @@ textarea.input {
   padding: 12px 20px;
   font-size: large;
   font-weight: bold;
+}
+
+.job-link {
+  text-decoration: none;
+  color: black;
+}
+
+.job-link:hover {
+  text-decoration: underline;
 }
