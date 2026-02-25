@@ -58,6 +58,8 @@ form {
   font-size: 16px;
   cursor: pointer;
   transition: 0.2s;
+  text-decoration: none;
+  display: inline-block;
 }
 
 .button:hover {
@@ -156,4 +158,34 @@ textarea.input {
 
 .job-link:hover {
   text-decoration: underline;
+}
+
+.org-card {
+  padding: 12px;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  margin-bottom: 12px;
+}
+
+.org-card:hover {
+  background: #f5f5f5;
+}
+
+.org-card a {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
 }
