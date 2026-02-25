@@ -14,13 +14,15 @@
   function apply() {
     if (!job) return;
 
+    const currentJob = job;
+
     applications.update((current) => [
       ...current,
-      { jobId: job.id, appliedAt: Date.now() },
+      { jobId: currentJob.id, appliedAt: Date.now() },
     ]);
   }
 
-  $: isApplied = job && $applications.some((a) => a.jobId === job.id);
+  $: isApplied = job ? $applications.some((a) => a.jobId === job?.id) : false;
 </script>
 
 <div class="container">
