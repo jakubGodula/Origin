@@ -23,6 +23,8 @@
     "@types/react-dom": "^18.3.7",
     "eslint": "^9",
     "eslint-config-next": "16.0.3",
+    "prettier": "^3.8.1",
+    "prettier-plugin-svelte": "^3.5.0",
     "tailwindcss": "^4",
     "typescript": "^5"
   }
