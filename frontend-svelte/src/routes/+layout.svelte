@@ -11,7 +11,7 @@
 
 <div>
   <nav class="navbar">
-    <div class="logo">JOB MARKETPLACE</div>
+    <div class="logo"><a href="/">JOB MARKETPLACE</a></div>
 
     <div class="nav-links">
       <a href="/">Home</a>
