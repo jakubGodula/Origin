@@ -1,74 +1,125 @@
 <script lang="ts">
   import { organizations } from "$lib/stores/organizations";
+  import type { Organization, Branch } from "$lib/stores/organizations";
   import { goto } from "$app/navigation";
 
   let name = "";
   let description = "";
-  let country = "";
-  let city = "";
-  let hrEmail = "";
+  let error = "";
 
-  let successMessage = "";
+  let branches: Branch[] = [
+    {
+      id: crypto.randomUUID(),
+      country: "",
+      city: "",
+      hrEmail: "",
+    },
+  ];
 
-  function createOrganization() {
-    if (!name || !country || !city || !hrEmail) return;
+  function addBranch() {
+    branches = [
+      ...branches,
+      {
+        id: crypto.randomUUID(),
+        country: "",
+        city: "",
+        hrEmail: "",
+      },
+    ];
+  }
 
-    const newOrg = {
+  function removeBranch(id: string) {
+    if (branches.length === 1) {
+      error = "At least one branch is required.";
+      return;
+    }
+
+    branches = branches.filter((b) => b.id !== id);
+  }
+
+  function validateEmail(email: string) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  }
+
+  function saveOrganization() {
+    error = "";
+
+    if (!name.trim()) {
+      error = "Organization name is required.";
+      return;
+    }
+
+    if (branches.length === 0) {
+      error = "At least one branch is required.";
+      return;
+    }
+
+    for (const branch of branches) {
+      if (!branch.country.trim() || !branch.city.trim()) {
+        error = "Country and city are required for each branch.";
+        return;
+      }
+
+      if (!validateEmail(branch.hrEmail)) {
+        error = "Each branch must have a valid HR email.";
+        return;
+      }
+    }
+
+    const newOrg: Organization = {
       id: crypto.randomUUID(),
       name,
       description,
-      branches: [
-        {
-          id: crypto.randomUUID(),
-          country,
-          city,
-          hrEmail,
-        },
-      ],
+      branches,
     };
 
     organizations.update((current) => [...current, newOrg]);
 
-    successMessage = "Organization created successfully!";
-
-    name = "";
-    description = "";
-    country = "";
-    city = "";
-    hrEmail = "";
-
-    setTimeout(() => {
-      successMessage = "";
-      goto("/organization");
-    }, 1500);
+    goto("/organizations");
   }
 </script>
 
 <div class="container">
   <h2>Create Organization</h2>
 
-  <form on:submit|preventDefault={createOrganization}>
-    <input
-      class="input"
-      placeholder="Organization name"
-      bind:value={name}
-      required
-    />
-    <input class="input" placeholder="Description" bind:value={description} />
-    <input class="input" placeholder="Country" bind:value={country} required />
-    <input class="input" placeholder="City" bind:value={city} required />
-    <input
-      class="input"
-      placeholder="HR email"
-      type="email"
-      bind:value={hrEmail}
-      required
-    />
-
-    <button class="button" type="submit">Create</button>
-  </form>
-
-  {#if successMessage}
-    <div class="success">{successMessage}</div>
+  {#if error}
+    <p class="error">{error}</p>
   {/if}
+
+  <div class="branch-card">
+    <input class="input" placeholder="Organization Name" bind:value={name} />
+
+    <textarea class="input" placeholder="Description" bind:value={description}
+    ></textarea>
+  </div>
+
+  <h3>HR Branches</h3>
+
+  {#each branches as branch (branch.id)}
+    <div class="branch-card">
+      <input class="input" placeholder="Country" bind:value={branch.country} />
+
+      <input class="input" placeholder="City" bind:value={branch.city} />
+
+      <input class="input" placeholder="HR Email" bind:value={branch.hrEmail} />
+
+      <button
+        type="button"
+        class="button danger"
+        on:click={() => removeBranch(branch.id)}
+      >
+        Remove Branch
+      </button>
+    </div>
+  {/each}
+
+  <div class="buttons">
+    <button type="button" class="button" on:click={addBranch}>
+      + Add Branch
+    </button>
+
+    <button type="button" class="button" on:click={saveOrganization}>
+      Save Organization
+    </button>
+  </div>
 </div>

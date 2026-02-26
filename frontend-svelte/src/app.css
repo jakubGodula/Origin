@@ -26,7 +26,6 @@ h2 {
 }
 
 .buttons {
-  margin-bottom: 30px;
   display: grid;
   grid-template-columns: auto auto;
   gap: 12px;
@@ -112,7 +111,6 @@ button:disabled {
 }
 
 .content {
-  flex: 1;
   padding: 40px 20px;
 }
 
@@ -188,4 +186,22 @@ ul {
   list-style: none;
   padding: 0;
   margin: 0;
+}
+
+.branch-card {
+  margin-top: 16px;
+  padding: 16px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.danger {
+  background: #d33;
+}
+
+.danger:hover {
+  opacity: 0.8;
 }
