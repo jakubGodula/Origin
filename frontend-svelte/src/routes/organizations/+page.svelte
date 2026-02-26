@@ -5,7 +5,7 @@
 <div class="container">
   <div class="header">
     <h2>Organizations</h2>
-    <a href="/organization/create" class="button">Create organization</a>
+    <a href="/organizations/create" class="button">Create organization</a>
   </div>
 
   {#if $organizations.length === 0}
@@ -14,7 +14,7 @@
     <ul>
       {#each $organizations as org}
         <li class="org-card">
-          <a href={`/organization/${org.id}`}>
+          <a href={`/organizations/${org.id}`}>
             <strong>{org.name}</strong>
             <p>{org.branches.length} branch(es)</p>
           </a>
