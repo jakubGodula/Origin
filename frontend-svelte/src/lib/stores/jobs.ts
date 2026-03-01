@@ -1,23 +1,32 @@
 import { writable } from "svelte/store";
 
-export type Job = {
+export interface Job {
   id: number;
   title: string;
-  company: string;
-  location: string;
   salary: string;
   description?: string;
-};
+  organizationId: string;
+  branchId: string;
+}
 
-const storedJobs =
-  typeof localStorage !== "undefined" ? localStorage.getItem("jobs") : null;
+function createJobStore() {
+  const stored =
+    typeof localStorage !== "undefined" ? localStorage.getItem("jobs") : null;
 
-const initialJobs: Job[] = storedJobs ? JSON.parse(storedJobs) : [];
+  const initial = stored ? JSON.parse(stored) : [];
 
-export const jobs = writable<Job[]>(initialJobs);
+  const { subscribe, set, update } = writable<Job[]>(initial);
 
-jobs.subscribe((value) => {
-  if (typeof localStorage !== "undefined") {
-    localStorage.setItem("jobs", JSON.stringify(value));
-  }
-});
+  return {
+    subscribe,
+    set,
+    update: (callback: (value: Job[]) => Job[]) =>
+      update((current) => {
+        const updated = callback(current);
+        localStorage.setItem("jobs", JSON.stringify(updated));
+        return updated;
+      }),
+  };
+}
+
+export const jobs = createJobStore();

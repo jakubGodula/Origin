@@ -1,6 +1,7 @@
 <script lang="ts">
   import { page } from "$app/stores";
   import { jobs } from "$lib/stores/jobs";
+  import { organizations } from "$lib/stores/organizations";
   import { applications } from "$lib/stores/applications";
   import type { Job } from "$lib/stores/jobs";
 
@@ -10,6 +11,14 @@
     const id = Number($page.params.id);
     job = $jobs.find((j) => j.id === id);
   }
+
+  $: organization = job
+    ? $organizations.find((o) => o.id === job?.organizationId)
+    : undefined;
+
+  $: branch = organization
+    ? organization.branches.find((b) => b.id === job?.branchId)
+    : undefined;
 
   function apply() {
     if (!job) return;
@@ -28,8 +37,17 @@
 <div class="container">
   {#if job}
     <h2>{job.title}</h2>
-    <p><strong>Company:</strong> {job.company}</p>
-    <p><strong>Location:</strong> {job.location}</p>
+
+    <p>
+      <strong>Organization:</strong>
+      {organization ? organization.name : "Unknown"}
+    </p>
+
+    <p>
+      <strong>Location:</strong>
+      {branch ? `${branch.country} — ${branch.city}` : "Unknown"}
+    </p>
+
     <p><strong>Salary:</strong> {job.salary}</p>
 
     {#if job.description}
