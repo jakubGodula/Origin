@@ -15,9 +15,10 @@
 
     <div class="nav-links">
       <a href="/">Home</a>
-      <a href="/organizations">Organization</a>
       <a href="/jobs">Job Offers</a>
       <a href="/post-job">Post a Job</a>
+      <a href="/organizations">Organization</a>
+      <a href="/applications">My Applications</a>
     </div>
   </nav>
 
