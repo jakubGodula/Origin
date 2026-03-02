@@ -1,10 +1,16 @@
 import { writable } from "svelte/store";
 
-export type Application = {
+export type ApplicationStatus =
+  | "pending"
+  | "reviewed"
+  | "accepted"
+  | "rejected";
+
+export interface Application {
   jobId: number;
   appliedAt: number;
-};
-
+  status: ApplicationStatus;
+}
 const stored =
   typeof localStorage !== "undefined"
     ? localStorage.getItem("applications")
