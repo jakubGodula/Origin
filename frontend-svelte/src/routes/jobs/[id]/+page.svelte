@@ -27,7 +27,7 @@
 
     applications.update((current) => [
       ...current,
-      { jobId: currentJob.id, appliedAt: Date.now() },
+      { jobId: currentJob.id, appliedAt: Date.now(), status: "pending" },
     ]);
   }
 

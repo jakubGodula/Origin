@@ -1,5 +1,6 @@
 <script lang="ts">
   import { applications } from "$lib/stores/applications";
+  import type { ApplicationStatus } from "$lib/stores/applications";
   import { jobs } from "$lib/stores/jobs";
   import { organizations } from "$lib/stores/organizations";
   import type { Job } from "$lib/stores/jobs";
@@ -20,12 +21,14 @@
       return {
         ...job,
         appliedAt: app.appliedAt,
+        status: app.status,
         organizationName: organization?.name ?? "Unknown",
       };
     })
     .filter(Boolean) as (Job & {
     appliedAt: number;
     organizationName: string;
+    status: ApplicationStatus;
   })[];
 </script>
 
@@ -46,6 +49,12 @@
         <p><strong>Organization:</strong> {job.organizationName}</p>
         <p><strong>Salary:</strong> {job.salary}</p>
         <p><strong>Applied at:</strong> {formatDate(job.appliedAt)}</p>
+        <p>
+          <strong>Status:</strong>
+          <span class={`status ${job.status}`}>
+            {job.status}
+          </span>
+        </p>
       </div>
     {/each}
   {/if}
