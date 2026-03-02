@@ -29,6 +29,10 @@
   {#if organization}
     <h2>{organization.name}</h2>
 
+    <div>
+      <a class="button" href={`/hr/${organization.id}`}> Open HR Panel </a>
+    </div>
+
     {#if organization.description}
       <p style="margin-bottom:20px;">
         {organization.description}
