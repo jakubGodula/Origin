@@ -16,9 +16,10 @@
     <div class="nav-links">
       <a href="/">Home</a>
       <a href="/jobs">Job Offers</a>
+      <a href="/applications">My Applications</a>
       <a href="/post-job">Post a Job</a>
       <a href="/organizations">Organization</a>
-      <a href="/applications">My Applications</a>
+      <a href="/hr">HR Panel</a>
     </div>
   </nav>
 
