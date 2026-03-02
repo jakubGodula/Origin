@@ -25,9 +25,15 @@ h2 {
   margin-bottom: 20px;
 }
 
-.buttons {
+.buttons-two {
   display: grid;
   grid-template-columns: auto auto;
+  gap: 12px;
+}
+
+.buttons-three {
+  display: grid;
+  grid-template-columns: auto auto auto;
   gap: 12px;
 }
 
@@ -203,4 +209,30 @@ ul {
 
 .danger:hover {
   opacity: 0.8;
+}
+
+.status {
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 14px;
+  text-transform: capitalize;
+}
+
+.status.pending {
+  background: #eee;
+}
+
+.status.reviewed {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.status.accepted {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.status.rejected {
+  background: #fee2e2;
+  color: #991b1b;
 }

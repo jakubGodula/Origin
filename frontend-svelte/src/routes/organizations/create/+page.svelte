@@ -113,7 +113,7 @@
     </div>
   {/each}
 
-  <div class="buttons">
+  <div class="buttons-two">
     <button type="button" class="button" on:click={addBranch}>
       + Add Branch
     </button>
