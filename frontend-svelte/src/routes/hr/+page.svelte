@@ -39,7 +39,7 @@
     <p>No applications yet.</p>
   {:else}
     {#each detailedApplications as app}
-      <div class="job-card">
+      <div class="tile">
         <h3>{app.jobTitle}</h3>
         <p><strong>Organization:</strong> {app.organizationName}</p>
         <p>
@@ -54,7 +54,7 @@
           </span>
         </p>
 
-        <div class="buttons-three">
+        <div class="buttons">
           <button
             class="button"
             on:click={() => updateStatus(app.jobId, "reviewed")}

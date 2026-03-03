@@ -39,7 +39,7 @@
     <p>You haven't applied to any jobs yet.</p>
   {:else}
     {#each appliedJobs as job}
-      <div class="job-card">
+      <div class="tile">
         <h3>
           <a href={`/jobs/${job.id}`} class="job-link">
             {job.title}

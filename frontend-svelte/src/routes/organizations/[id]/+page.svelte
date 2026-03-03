@@ -59,7 +59,7 @@
       <p>No job offers for this organization yet.</p>
     {:else}
       {#each organizationJobs as job}
-        <div class="job-card">
+        <div class="tile">
           <h4>
             <a href={`/jobs/${job.id}`} class="job-link">
               {job.title}

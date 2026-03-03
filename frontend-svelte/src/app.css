@@ -13,33 +13,19 @@ body {
 }
 
 .container {
-  max-width: 500px;
+  max-width: 900px;
   margin: 0 auto;
   padding: 24px;
   border-radius: 12px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
 }
 
-h2 {
+.title {
   text-align: center;
-  margin-bottom: 20px;
 }
 
-.buttons-two {
-  display: grid;
-  grid-template-columns: auto auto;
-  gap: 12px;
-}
-
-.buttons-three {
-  display: grid;
-  grid-template-columns: auto auto auto;
-  gap: 12px;
-}
-
-form {
+.buttons {
   display: flex;
-  flex-direction: column;
   gap: 12px;
 }
 
@@ -75,15 +61,9 @@ form {
   opacity: 0.9;
 }
 
-button:disabled {
+.button:disabled {
   opacity: 0.6;
   cursor: not-allowed;
-}
-
-.error {
-  color: red;
-  font-size: 14px;
-  margin-top: -6px;
 }
 
 .navbar {
@@ -91,7 +71,7 @@ button:disabled {
   color: white;
   padding: 16px 32px;
   display: flex;
-  justify-content: space-between;
+  justify-content: space-around;
   align-items: center;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
 }
@@ -119,7 +99,7 @@ button:disabled {
   padding: 40px 20px;
 }
 
-.job-card {
+.tile {
   background: white;
   padding: 16px;
   border-radius: 10px;
@@ -127,31 +107,12 @@ button:disabled {
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
 }
 
-.job-card h3 {
+.tile h3 {
   margin-bottom: 8px;
-}
-
-.small {
-  margin-top: 10px;
-  padding: 6px 10px;
-  font-size: 14px;
 }
 
 textarea.input {
   resize: vertical;
-}
-
-.success {
-  position: fixed;
-  left: 50%;
-  top: 70px;
-  transform: translateX(-50%);
-  border-radius: 10px;
-  background: lightgreen;
-  margin: auto;
-  padding: 12px 20px;
-  font-size: large;
-  font-weight: bold;
 }
 
 .job-link {
@@ -163,36 +124,6 @@ textarea.input {
   text-decoration: underline;
 }
 
-.org-card {
-  padding: 12px;
-  border: 1px solid #eee;
-  border-radius: 8px;
-  margin-bottom: 12px;
-}
-
-.org-card:hover {
-  background: #f5f5f5;
-}
-
-.org-card a {
-  text-decoration: none;
-  color: inherit;
-  display: block;
-}
-
-.header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 16px;
-}
-
-ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
 .branch-card {
   margin-top: 16px;
   padding: 16px;
@@ -201,14 +132,6 @@ ul {
   display: flex;
   flex-direction: column;
   gap: 10px;
-}
-
-.danger {
-  background: #d33;
-}
-
-.danger:hover {
-  opacity: 0.8;
 }
 
 .status {

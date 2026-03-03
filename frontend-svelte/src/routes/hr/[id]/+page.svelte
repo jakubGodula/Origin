@@ -58,7 +58,7 @@
       <p>No applications for this organization yet.</p>
     {:else}
       {#each organizationApplications as app}
-        <div class="job-card">
+        <div class="tile">
           <h3>{app.jobTitle}</h3>
 
           <p>
@@ -73,7 +73,7 @@
             {new Date(app.appliedAt).toLocaleString()}
           </p>
 
-          <div class="buttons-three">
+          <div class="buttons">
             <button
               class="button"
               on:click={() => updateStatus(app.jobId, "reviewed")}

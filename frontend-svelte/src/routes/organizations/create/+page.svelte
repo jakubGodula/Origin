@@ -103,17 +103,19 @@
 
       <input class="input" placeholder="HR Email" bind:value={branch.hrEmail} />
 
-      <button
-        type="button"
-        class="button danger"
-        on:click={() => removeBranch(branch.id)}
-      >
-        Remove Branch
-      </button>
+      <div>
+        <button
+          type="button"
+          class="button danger"
+          on:click={() => removeBranch(branch.id)}
+        >
+          Remove Branch
+        </button>
+      </div>
     </div>
   {/each}
 
-  <div class="buttons-two">
+  <div class="buttons">
     <button type="button" class="button" on:click={addBranch}>
       + Add Branch
     </button>
@@ -123,3 +125,19 @@
     </button>
   </div>
 </div>
+
+<style>
+  .error {
+    color: red;
+    font-size: 14px;
+    margin-top: -6px;
+  }
+
+  .danger {
+    background: #d33;
+  }
+
+  .danger:hover {
+    opacity: 0.8;
+  }
+</style>

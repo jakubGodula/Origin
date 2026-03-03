@@ -23,3 +23,33 @@
     </ul>
   {/if}
 </div>
+
+<style>
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+  }
+  ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  .org-card {
+    padding: 12px;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    margin-bottom: 12px;
+  }
+
+  .org-card:hover {
+    background: #f5f5f5;
+  }
+
+  .org-card a {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+  }
+</style>

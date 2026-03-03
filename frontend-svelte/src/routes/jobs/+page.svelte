@@ -17,7 +17,7 @@
 
     {@const branch = organization?.branches.find((b) => b.id === job.branchId)}
 
-    <div class="job-card">
+    <div class="tile">
       <h3>
         <a href={`/jobs/${job.id}`} class="job-link">
           {job.title}

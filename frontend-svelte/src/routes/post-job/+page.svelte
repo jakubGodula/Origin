@@ -45,21 +45,28 @@
   <h2>Post a Job</h2>
 
   <form on:submit|preventDefault={submitJob}>
-    <input class="input" placeholder="Job title" bind:value={title} required />
+    <div class="field">
+      <input
+        class="input"
+        placeholder="Job title"
+        bind:value={title}
+        required
+      />
 
-    <input
-      class="input"
-      placeholder="Salary range"
-      bind:value={salary}
-      required
-    />
+      <input
+        class="input"
+        placeholder="Salary range"
+        bind:value={salary}
+        required
+      />
 
-    <textarea
-      class="input"
-      placeholder="Job description"
-      rows="4"
-      bind:value={description}
-    ></textarea>
+      <textarea
+        class="input"
+        placeholder="Job description"
+        rows="4"
+        bind:value={description}
+      ></textarea>
+    </div>
 
     <h3>Select Organization</h3>
 
@@ -92,3 +99,23 @@
 {#if success}
   <div class="success">Job posted successfully!</div>
 {/if}
+
+<style>
+  .field {
+    display: grid;
+    grid-template-columns: auto;
+    gap: 12px;
+  }
+  .success {
+    position: fixed;
+    left: 50%;
+    top: 70px;
+    transform: translateX(-50%);
+    border-radius: 10px;
+    background: lightgreen;
+    margin: auto;
+    padding: 12px 20px;
+    font-size: large;
+    font-weight: bold;
+  }
+</style>
