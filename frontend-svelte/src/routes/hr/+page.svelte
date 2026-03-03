@@ -12,34 +12,24 @@
     );
   }
 
-  type DetailedApplication = {
-    jobId: number;
-    appliedAt: number;
-    status: ApplicationStatus;
-    jobTitle: string;
-    organizationName: string;
-  };
-
-  let detailedApplications: DetailedApplication[] = [];
-
-  $: {
-    detailedApplications = $applications
-      .map((app) => {
-        const job = $jobs.find((j) => j.id === app.jobId);
-        if (!job) return null;
-
-        const organization = $organizations.find(
-          (o) => o.id === job.organizationId,
-        );
-
-        return {
-          ...app,
-          jobTitle: job.title,
-          organizationName: organization?.name ?? "Unknown",
-        };
-      })
-      .filter((app): app is DetailedApplication => app !== null);
+  function isNotNull<T>(value: T | null): value is T {
+    return value !== null;
   }
+
+  $: detailedApplications = $applications
+    .map((app) => {
+      const job = $jobs.find((j) => j.id === app.jobId);
+      if (!job) return null;
+      const organization = $organizations.find(
+        (o) => o.id === job.organizationId,
+      );
+      return {
+        ...app,
+        jobTitle: job.title,
+        organizationName: organization?.name ?? "Unknown",
+      };
+    })
+    .filter(isNotNull);
 </script>
 
 <div class="container">
