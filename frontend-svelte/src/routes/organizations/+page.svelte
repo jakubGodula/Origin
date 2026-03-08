@@ -31,6 +31,12 @@
     align-items: center;
     margin-bottom: 16px;
   }
+
+  @media (max-width: 425px) {
+    .header {
+      flex-direction: column;
+    }
+  }
   ul {
     list-style: none;
     padding: 0;
