@@ -23,6 +23,37 @@
       organizationJobs = [];
     }
   }
+
+  let country = "";
+  let city = "";
+  let hrEmail = "";
+
+  function addBranch() {
+    if (!organization || !country || !city || !hrEmail) return;
+
+    organizations.update((orgs) =>
+      orgs.map((org) =>
+        org.id === organization!.id
+          ? {
+              ...org,
+              branches: [
+                ...org.branches,
+                {
+                  id: crypto.randomUUID(),
+                  country,
+                  city,
+                  hrEmail,
+                },
+              ],
+            }
+          : org,
+      ),
+    );
+
+    country = "";
+    city = "";
+    hrEmail = "";
+  }
 </script>
 
 <div class="container">
@@ -31,6 +62,27 @@
 
     <div>
       <a class="button" href={`/hr/${organization.id}`}> Open HR Panel </a>
+      <div>
+        <form on:submit|preventDefault={addBranch}>
+          <input
+            class="input"
+            placeholder="Country"
+            bind:value={country}
+            required
+          />
+
+          <input class="input" placeholder="City" bind:value={city} required />
+
+          <input
+            class="input"
+            placeholder="HR Email"
+            bind:value={hrEmail}
+            required
+          />
+
+          <button class="button">Add Branch</button>
+        </form>
+      </div>
     </div>
 
     {#if organization.description}
@@ -53,7 +105,7 @@
       {/each}
     {/if}
 
-    <h3 style="margin-top:30px;">Job Offers</h3>
+    <h3>Job Offers</h3>
 
     {#if organizationJobs.length === 0}
       <p>No job offers for this organization yet.</p>
