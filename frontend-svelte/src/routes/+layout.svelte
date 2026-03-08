@@ -1,8 +1,18 @@
 <script lang="ts">
   import favicon from "$lib/assets/favicon.svg";
+  import { page } from "$app/state";
   import "../app.css";
 
   let { children } = $props();
+
+  const links = [
+    { href: "/", label: "Home" },
+    { href: "/jobs", label: "Job Offers" },
+    { href: "/applications", label: "My Applications" },
+    { href: "/post-job", label: "Post a Job" },
+    { href: "/organizations", label: "Organizations" },
+    { href: "/hr", label: "HR Panel" },
+  ];
 </script>
 
 <svelte:head>
@@ -14,12 +24,16 @@
     <div class="logo"><a href="/">JOB MARKETPLACE</a></div>
 
     <div class="nav-links">
-      <a href="/">Home</a>
-      <a href="/jobs">Job Offers</a>
-      <a href="/applications">My Applications</a>
-      <a href="/post-job">Post a Job</a>
-      <a href="/organizations">Organization</a>
-      <a href="/hr">HR Panel</a>
+      {#each links as link}
+        <a
+          href={link.href}
+          class:active={link.href === "/"
+            ? page.url.pathname === "/"
+            : page.url.pathname.startsWith(link.href)}
+        >
+          {link.label}
+        </a>
+      {/each}
     </div>
   </nav>
 
