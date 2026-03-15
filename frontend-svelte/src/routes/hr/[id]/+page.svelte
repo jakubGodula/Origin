@@ -30,13 +30,13 @@
 
   $: {
     if (company) {
-      const orgId = company.id;
+      const companyId = company.id;
 
       companyApplications = $applications
         .map((app) => {
           const job = $jobs.find((j) => j.id === app.jobId);
           if (!job) return null;
-          if (job.companyId !== orgId) return null;
+          if (job.companyId !== companyId) return null;
 
           return {
             ...app,

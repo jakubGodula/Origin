@@ -72,8 +72,8 @@
 
     <select class="input" bind:value={companyId} required>
       <option value="">Select Company</option>
-      {#each $companies as org}
-        <option value={org.id}>{org.name}</option>
+      {#each $companies as company}
+        <option value={company.id}>{company.name}</option>
       {/each}
     </select>
 

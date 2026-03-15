@@ -66,14 +66,14 @@
       }
     }
 
-    const newOrg: Company = {
+    const newCompany: Company = {
       id: crypto.randomUUID(),
       name,
       description,
       branches,
     };
 
-    companies.update((current) => [...current, newOrg]);
+    companies.update((current) => [...current, newCompany]);
 
     goto("/companies");
   }

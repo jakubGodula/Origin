@@ -16,9 +16,9 @@
 
   $: {
     if (company) {
-      const orgId = company.id;
+      const companyId = company.id;
 
-      companyJobs = $jobs.filter((job) => job.companyId === orgId);
+      companyJobs = $jobs.filter((job) => job.companyId === companyId);
     } else {
       companyJobs = [];
     }
@@ -31,13 +31,13 @@
   function addBranch() {
     if (!company || !country || !city || !hrEmail) return;
 
-    companies.update((orgs) =>
-      orgs.map((org) =>
-        org.id === company!.id
+    companies.update((firms) =>
+      firms.map((company) =>
+        company.id === company!.id
           ? {
-              ...org,
+              ...company,
               branches: [
-                ...org.branches,
+                ...company.branches,
                 {
                   id: crypto.randomUUID(),
                   country,
@@ -46,7 +46,7 @@
                 },
               ],
             }
-          : org,
+          : company,
       ),
     );
 

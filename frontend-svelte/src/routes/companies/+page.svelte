@@ -12,11 +12,11 @@
     <p>No Companies yet.</p>
   {:else}
     <ul>
-      {#each $companies as org}
-        <li class="org-card">
-          <a href={`/companies/${org.id}`}>
-            <strong>{org.name}</strong>
-            <p>{org.branches.length} branch(es)</p>
+      {#each $companies as company}
+        <li class="company-card">
+          <a href={`/companies/${company.id}`}>
+            <strong>{company.name}</strong>
+            <p>{company.branches.length} branch(es)</p>
           </a>
         </li>
       {/each}
@@ -42,18 +42,18 @@
     padding: 0;
     margin: 0;
   }
-  .org-card {
+  .company-card {
     padding: 12px;
     border: 1px solid #eee;
     border-radius: 8px;
     margin-bottom: 12px;
   }
 
-  .org-card:hover {
+  .company-card:hover {
     background: #f5f5f5;
   }
 
-  .org-card a {
+  .company-card a {
     text-decoration: none;
     color: inherit;
     display: block;
