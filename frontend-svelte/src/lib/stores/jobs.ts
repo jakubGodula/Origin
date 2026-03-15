@@ -5,7 +5,7 @@ export interface Job {
   title: string;
   salary: string;
   description?: string;
-  organizationId: string;
+  companyId: string;
   branchId: string;
 }
 

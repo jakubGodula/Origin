@@ -2,7 +2,7 @@
   import { applications } from "$lib/stores/applications";
   import type { ApplicationStatus } from "$lib/stores/applications";
   import { jobs } from "$lib/stores/jobs";
-  import { organizations } from "$lib/stores/organizations";
+  import { companies } from "$lib/stores/companies";
   import type { Job } from "$lib/stores/jobs";
 
   function formatDate(timestamp: number) {
@@ -14,20 +14,18 @@
       const job = $jobs.find((j) => j.id === app.jobId);
       if (!job) return null;
 
-      const organization = $organizations.find(
-        (o) => o.id === job.organizationId,
-      );
+      const company = $companies.find((o) => o.id === job.companyId);
 
       return {
         ...job,
         appliedAt: app.appliedAt,
         status: app.status,
-        organizationName: organization?.name ?? "Unknown",
+        companyName: company?.name ?? "Unknown",
       };
     })
     .filter(Boolean) as (Job & {
     appliedAt: number;
-    organizationName: string;
+    companyName: string;
     status: ApplicationStatus;
   })[];
 </script>
@@ -46,7 +44,7 @@
           </a>
         </h3>
 
-        <p><strong>Organization:</strong> {job.organizationName}</p>
+        <p><strong>Company:</strong> {job.companyName}</p>
         <p><strong>Salary:</strong> {job.salary}</p>
         <p><strong>Applied at:</strong> {formatDate(job.appliedAt)}</p>
         <p>

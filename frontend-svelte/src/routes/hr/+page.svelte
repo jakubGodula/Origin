@@ -1,7 +1,7 @@
 <script lang="ts">
   import { applications } from "$lib/stores/applications";
   import { jobs } from "$lib/stores/jobs";
-  import { organizations } from "$lib/stores/organizations";
+  import { companies } from "$lib/stores/companies";
   import type { ApplicationStatus } from "$lib/stores/applications";
 
   function updateStatus(jobId: number, newStatus: ApplicationStatus) {
@@ -20,13 +20,13 @@
     .map((app) => {
       const job = $jobs.find((j) => j.id === app.jobId);
       if (!job) return null;
-      const organization = $organizations.find(
-        (o) => o.id === job.organizationId,
+      const company = $companies.find(
+        (o) => o.id === job.companyId,
       );
       return {
         ...app,
         jobTitle: job.title,
-        organizationName: organization?.name ?? "Unknown",
+        companyName: company?.name ?? "Unknown",
       };
     })
     .filter(isNotNull);
@@ -41,7 +41,7 @@
     {#each detailedApplications as app}
       <div class="tile">
         <h3>{app.jobTitle}</h3>
-        <p><strong>Organization:</strong> {app.organizationName}</p>
+        <p><strong>Company:</strong> {app.companyName}</p>
         <p>
           <strong>Applied at:</strong>
           {new Date(app.appliedAt).toLocaleString()}

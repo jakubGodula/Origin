@@ -1,26 +1,26 @@
 <script lang="ts">
   import { page } from "$app/stores";
-  import { organizations } from "$lib/stores/organizations";
-  import type { Organization } from "$lib/stores/organizations";
+  import { companies } from "$lib/stores/companies";
+  import type { Company } from "$lib/stores/companies";
   import { jobs } from "$lib/stores/jobs";
   import type { Job } from "$lib/stores/jobs";
 
-  let organization: Organization | undefined;
+  let company: Company | undefined;
 
   $: {
     const id = $page.params.id;
-    organization = $organizations.find((o) => o.id === id);
+    company = $companies.find((o) => o.id === id);
   }
 
-  let organizationJobs: Job[] = [];
+  let companyJobs: Job[] = [];
 
   $: {
-    if (organization) {
-      const orgId = organization.id;
+    if (company) {
+      const orgId = company.id;
 
-      organizationJobs = $jobs.filter((job) => job.organizationId === orgId);
+      companyJobs = $jobs.filter((job) => job.companyId === orgId);
     } else {
-      organizationJobs = [];
+      companyJobs = [];
     }
   }
 
@@ -29,11 +29,11 @@
   let hrEmail = "";
 
   function addBranch() {
-    if (!organization || !country || !city || !hrEmail) return;
+    if (!company || !country || !city || !hrEmail) return;
 
-    organizations.update((orgs) =>
+    companies.update((orgs) =>
       orgs.map((org) =>
-        org.id === organization!.id
+        org.id === company!.id
           ? {
               ...org,
               branches: [
@@ -57,11 +57,11 @@
 </script>
 
 <div class="container">
-  {#if organization}
-    <h2>{organization.name}</h2>
+  {#if company}
+    <h2>{company.name}</h2>
 
     <div>
-      <a class="button" href={`/hr/${organization.id}`}> Open HR Panel </a>
+      <a class="button" href={`/hr/${company.id}`}> Open HR Panel </a>
       <div>
         <form on:submit|preventDefault={addBranch}>
           <input
@@ -85,18 +85,18 @@
       </div>
     </div>
 
-    {#if organization.description}
+    {#if company.description}
       <p>
-        {organization.description}
+        {company.description}
       </p>
     {/if}
 
     <h3>Branches</h3>
 
-    {#if organization.branches.length === 0}
+    {#if company.branches.length === 0}
       <p>No branches yet.</p>
     {:else}
-      {#each organization.branches as branch}
+      {#each company.branches as branch}
         <div class="branch-card">
           <p><strong>Country:</strong> {branch.country}</p>
           <p><strong>City:</strong> {branch.city}</p>
@@ -107,10 +107,10 @@
 
     <h3>Job Offers</h3>
 
-    {#if organizationJobs.length === 0}
-      <p>No job offers for this organization yet.</p>
+    {#if companyJobs.length === 0}
+      <p>No job offers for this company yet.</p>
     {:else}
-      {#each organizationJobs as job}
+      {#each companyJobs as job}
         <div class="tile">
           <h4>
             <a href={`/jobs/${job.id}`} class="job-link">
@@ -122,6 +122,6 @@
       {/each}
     {/if}
   {:else}
-    <p>Organization not found.</p>
+    <p>Company not found.</p>
   {/if}
 </div>

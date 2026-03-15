@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { organizations } from "$lib/stores/organizations";
-  import type { Organization, Branch } from "$lib/stores/organizations";
+  import { companies } from "$lib/stores/companies";
+  import type { Company, Branch } from "$lib/stores/companies";
   import { goto } from "$app/navigation";
 
   let name = "";
@@ -41,11 +41,11 @@
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   }
 
-  function saveOrganization() {
+  function saveCompany() {
     error = "";
 
     if (!name.trim()) {
-      error = "Organization name is required.";
+      error = "Company name is required.";
       return;
     }
 
@@ -66,28 +66,28 @@
       }
     }
 
-    const newOrg: Organization = {
+    const newOrg: Company = {
       id: crypto.randomUUID(),
       name,
       description,
       branches,
     };
 
-    organizations.update((current) => [...current, newOrg]);
+    companies.update((current) => [...current, newOrg]);
 
-    goto("/organizations");
+    goto("/companies");
   }
 </script>
 
 <div class="container">
-  <h2>Create Organization</h2>
+  <h2>Create Company</h2>
 
   {#if error}
     <p class="error">{error}</p>
   {/if}
 
   <div class="branch-card">
-    <input class="input" placeholder="Organization Name" bind:value={name} />
+    <input class="input" placeholder="Company Name" bind:value={name} />
 
     <textarea class="input" placeholder="Description" bind:value={description}
     ></textarea>
@@ -120,8 +120,8 @@
       + Add Branch
     </button>
 
-    <button type="button" class="button" on:click={saveOrganization}>
-      Save Organization
+    <button type="button" class="button" on:click={saveCompany}>
+      Save Company
     </button>
   </div>
 </div>

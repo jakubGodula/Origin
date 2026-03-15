@@ -1,7 +1,7 @@
 <script lang="ts">
   import { page } from "$app/stores";
   import { jobs } from "$lib/stores/jobs";
-  import { organizations } from "$lib/stores/organizations";
+  import { companies } from "$lib/stores/companies";
   import { applications } from "$lib/stores/applications";
   import type { Job } from "$lib/stores/jobs";
 
@@ -12,12 +12,12 @@
     job = $jobs.find((j) => j.id === id);
   }
 
-  $: organization = job
-    ? $organizations.find((o) => o.id === job?.organizationId)
+  $: company = job
+    ? $companies.find((o) => o.id === job?.companyId)
     : undefined;
 
-  $: branch = organization
-    ? organization.branches.find((b) => b.id === job?.branchId)
+  $: branch = company
+    ? company.branches.find((b) => b.id === job?.branchId)
     : undefined;
 
   function apply() {
@@ -39,8 +39,8 @@
     <h2>{job.title}</h2>
 
     <p>
-      <strong>Organization:</strong>
-      {organization ? organization.name : "Unknown"}
+      <strong>Company:</strong>
+      {company ? company.name : "Unknown"}
     </p>
 
     <p>

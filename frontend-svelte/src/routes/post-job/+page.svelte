@@ -1,27 +1,27 @@
 <script lang="ts">
   import { jobs } from "$lib/stores/jobs";
-  import { organizations } from "$lib/stores/organizations";
+  import { companies } from "$lib/stores/companies";
 
   let title = "";
   let salary = "";
   let description = "";
 
-  let organizationId = "";
+  let companyId = "";
   let branchId = "";
 
   let success = false;
 
-  $: selectedOrganization = $organizations.find((o) => o.id === organizationId);
+  $: selectedCompany = $companies.find((o) => o.id === companyId);
 
   function submitJob() {
-    if (!title || !salary || !organizationId || !branchId) return;
+    if (!title || !salary || !companyId || !branchId) return;
 
     const newJob = {
       id: Date.now(),
       title,
       salary,
       description,
-      organizationId,
+      companyId,
       branchId,
     };
 
@@ -32,7 +32,7 @@
     title = "";
     salary = "";
     description = "";
-    organizationId = "";
+    companyId = "";
     branchId = "";
 
     setTimeout(() => {
@@ -68,21 +68,21 @@
       ></textarea>
     </div>
 
-    <h3>Select Organization</h3>
+    <h3>Select Company</h3>
 
-    <select class="input" bind:value={organizationId} required>
-      <option value="">Select organization</option>
-      {#each $organizations as org}
+    <select class="input" bind:value={companyId} required>
+      <option value="">Select Company</option>
+      {#each $companies as org}
         <option value={org.id}>{org.name}</option>
       {/each}
     </select>
 
-    {#if selectedOrganization}
+    {#if selectedCompany}
       <h3>Select Branch</h3>
 
       <select class="input" bind:value={branchId} required>
         <option value="">Select branch</option>
-        {#each selectedOrganization.branches as branch}
+        {#each selectedCompany.branches as branch}
           <option value={branch.id}>
             {branch.country} — {branch.city}
           </option>

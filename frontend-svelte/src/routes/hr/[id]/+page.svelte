@@ -2,15 +2,15 @@
   import { page } from "$app/stores";
   import { applications } from "$lib/stores/applications";
   import { jobs } from "$lib/stores/jobs";
-  import { organizations } from "$lib/stores/organizations";
+  import { companies } from "$lib/stores/companies";
+  import type { Company } from "$lib/stores/companies";
   import type { ApplicationStatus } from "$lib/stores/applications";
-  import type { Organization } from "$lib/stores/organizations";
 
-  let organization: Organization | undefined;
+  let company: Company | undefined;
 
   $: {
     const id = $page.params.id;
-    organization = $organizations.find((o) => o.id === id);
+    company = $companies.find((o) => o.id === id);
   }
 
   function updateStatus(jobId: number, newStatus: ApplicationStatus) {
@@ -21,7 +21,7 @@
     );
   }
 
-  let organizationApplications: {
+  let companyApplications: {
     jobId: number;
     appliedAt: number;
     status: ApplicationStatus;
@@ -29,14 +29,14 @@
   }[] = [];
 
   $: {
-    if (organization) {
-      const orgId = organization.id;
+    if (company) {
+      const orgId = company.id;
 
-      organizationApplications = $applications
+      companyApplications = $applications
         .map((app) => {
           const job = $jobs.find((j) => j.id === app.jobId);
           if (!job) return null;
-          if (job.organizationId !== orgId) return null;
+          if (job.companyId !== orgId) return null;
 
           return {
             ...app,
@@ -45,19 +45,19 @@
         })
         .filter((app): app is NonNullable<typeof app> => app !== null);
     } else {
-      organizationApplications = [];
+      companyApplications = [];
     }
   }
 </script>
 
 <div class="container">
-  {#if organization}
-    <h2>HR Panel — {organization.name}</h2>
+  {#if company}
+    <h2>HR Panel — {company.name}</h2>
 
-    {#if organizationApplications.length === 0}
-      <p>No applications for this organization yet.</p>
+    {#if companyApplications.length === 0}
+      <p>No applications for this company yet.</p>
     {:else}
-      {#each organizationApplications as app}
+      {#each companyApplications as app}
         <div class="tile">
           <h3>{app.jobTitle}</h3>
 
@@ -99,6 +99,6 @@
       {/each}
     {/if}
   {:else}
-    <p>Organization not found.</p>
+    <p>Company not found.</p>
   {/if}
 </div>

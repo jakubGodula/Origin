@@ -1,20 +1,20 @@
 <script lang="ts">
-  import { organizations } from "$lib/stores/organizations";
+  import { companies } from "$lib/stores/companies";
 </script>
 
 <div class="container">
   <div class="header">
-    <h2>Organizations</h2>
-    <a href="/organizations/create" class="button">Create organization</a>
+    <h2>Companies</h2>
+    <a href="/companies/create" class="button">Create Company</a>
   </div>
 
-  {#if $organizations.length === 0}
-    <p>No organizations yet.</p>
+  {#if $companies.length === 0}
+    <p>No Companies yet.</p>
   {:else}
     <ul>
-      {#each $organizations as org}
+      {#each $companies as org}
         <li class="org-card">
-          <a href={`/organizations/${org.id}`}>
+          <a href={`/companies/${org.id}`}>
             <strong>{org.name}</strong>
             <p>{org.branches.length} branch(es)</p>
           </a>

@@ -9,7 +9,7 @@
     { href: "/", label: "Home" },
     { href: "/jobs", label: "Job Offers" },
     { href: "/applications", label: "My Applications" },
-    { href: "/organizations", label: "Organizations" },
+    { href: "/companies", label: "Companies" },
     { href: "/hr", label: "HR Panel" },
   ];
 </script>
