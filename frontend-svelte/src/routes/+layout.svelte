@@ -9,7 +9,6 @@
     { href: "/", label: "Home" },
     { href: "/jobs", label: "Job Offers" },
     { href: "/applications", label: "My Applications" },
-    { href: "/post-job", label: "Post a Job" },
     { href: "/organizations", label: "Organizations" },
     { href: "/hr", label: "HR Panel" },
   ];

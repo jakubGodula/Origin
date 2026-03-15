@@ -4,7 +4,10 @@
 </script>
 
 <div class="container">
-  <h2>Job Offers</h2>
+  <div class="header">
+    <h2>Job Offers</h2>
+    <a href="/post-job" class="button">+ Post a Job</a>
+  </div>
 
   {#if $jobs.length === 0}
     <p>No job offers yet.</p>
@@ -38,3 +41,12 @@
     </div>
   {/each}
 </div>
+
+<style>
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+  }
+</style>
