@@ -51,7 +51,7 @@
     <p><strong>Salary:</strong> {job.salary}</p>
 
     {#if job.description}
-      <p style="margin-top: 16px;">
+      <p>
         <strong>Description:</strong><br />
         {job.description}
       </p>
@@ -59,7 +59,6 @@
 
     <button
       class="button"
-      style="margin-top:20px;"
       on:click={apply}
       disabled={isApplied}
     >

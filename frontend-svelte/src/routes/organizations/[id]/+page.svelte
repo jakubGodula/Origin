@@ -86,7 +86,7 @@
     </div>
 
     {#if organization.description}
-      <p style="margin-bottom:20px;">
+      <p>
         {organization.description}
       </p>
     {/if}
