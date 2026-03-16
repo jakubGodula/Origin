@@ -17,27 +17,49 @@
   let search = "";
   let selectedCompany = "";
   let selectedLocation = "";
+  let sortBy = "newest";
 
-  $: filteredJobs = expandedJobs.filter((job) => {
-    const text = search.toLowerCase();
+  function parseSalary(salary: string) {
+    const match = salary.match(/\d+/);
+    return match ? Number(match[0]) : 0;
+  }
 
-    const searchableText = `
+  $: filteredJobs = expandedJobs
+    .filter((job) => {
+      const text = search.toLowerCase();
+
+      const searchableText = `
       ${job.title}
       ${job.companyName}
       ${job.location}
       ${job.salary}
     `.toLowerCase();
 
-    const matchesSearch = searchableText.includes(text);
+      const matchesSearch = searchableText.includes(text);
 
-    const matchesCompany =
-      !selectedCompany || job.companyId === selectedCompany;
+      const matchesCompany =
+        !selectedCompany || job.companyId === selectedCompany;
 
-    const matchesLocation =
-      !selectedLocation || job.location === selectedLocation;
+      const matchesLocation =
+        !selectedLocation || job.location === selectedLocation;
 
-    return matchesSearch && matchesCompany && matchesLocation;
-  });
+      return matchesSearch && matchesCompany && matchesLocation;
+    })
+    .sort((a, b) => {
+      if (sortBy === "newest") {
+        return b.id - a.id;
+      }
+
+      if (sortBy === "salary-asc") {
+        return parseSalary(a.salary) - parseSalary(b.salary);
+      }
+
+      if (sortBy === "salary-desc") {
+        return parseSalary(b.salary) - parseSalary(a.salary);
+      }
+
+      return 0;
+    });
 
   $: locations = [...new Set(expandedJobs.map((job) => job.location))];
 </script>
@@ -46,7 +68,7 @@
   <div class="filters">
     <input
       class="input"
-      placeholder="🔍 Search jobs, companies, locations..."
+      placeholder="🔍 Search jobs, companies..."
       bind:value={search}
     />
 
@@ -69,6 +91,12 @@
         </option>
       {/each}
     </select>
+
+    <select class="input" bind:value={sortBy}>
+      <option value="newest">Newest</option>
+      <option value="salary-asc">Salary ↑</option>
+      <option value="salary-desc">Salary ↓</option>
+    </select>
   </div>
 
   <button
@@ -77,6 +105,7 @@
       search = "";
       selectedCompany = "";
       selectedLocation = "";
+      sortBy = "newest";
     }}
   >
     Reset filters
