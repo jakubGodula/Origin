@@ -62,27 +62,25 @@
 
     <div>
       <a class="button" href={`/hr/${company.id}`}> Open HR Panel </a>
-      <div>
-        <form on:submit|preventDefault={addBranch}>
-          <input
-            class="input"
-            placeholder="Country"
-            bind:value={country}
-            required
-          />
+      <form class="form" on:submit|preventDefault={addBranch}>
+        <input
+          class="input"
+          placeholder="Country"
+          bind:value={country}
+          required
+        />
 
-          <input class="input" placeholder="City" bind:value={city} required />
+        <input class="input" placeholder="City" bind:value={city} required />
 
-          <input
-            class="input"
-            placeholder="HR Email"
-            bind:value={hrEmail}
-            required
-          />
+        <input
+          class="input"
+          placeholder="HR Email"
+          bind:value={hrEmail}
+          required
+        />
 
-          <button class="button">Add Branch</button>
-        </form>
-      </div>
+        <button class="button">Add Branch</button>
+      </form>
     </div>
 
     {#if company.description}
@@ -125,3 +123,13 @@
     <p>Company not found.</p>
   {/if}
 </div>
+
+<style>
+  .form {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: end;
+    gap: 10px;
+    margin-top: 10px;
+  }
+</style>
