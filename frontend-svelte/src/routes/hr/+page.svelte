@@ -16,13 +16,19 @@
     return value !== null;
   }
 
+  let selectedCompany = "";
+
   $: detailedApplications = $applications
     .map((app) => {
       const job = $jobs.find((j) => j.id === app.jobId);
       if (!job) return null;
-      const company = $companies.find(
-        (o) => o.id === job.companyId,
-      );
+
+      const company = $companies.find((c) => c.id === job.companyId);
+
+      if (selectedCompany && job.companyId !== selectedCompany) {
+        return null;
+      }
+
       return {
         ...app,
         jobTitle: job.title,
@@ -33,7 +39,25 @@
 </script>
 
 <div class="container">
-  <h2>HR Panel</h2>
+  <div class="header">
+    <h2>HR Panel</h2>
+
+    <select class="input" bind:value={selectedCompany}>
+      <option value="">All companies</option>
+
+      {#each $companies as company}
+        <option value={company.id}>
+          {company.name}
+        </option>
+      {/each}
+    </select>
+  </div>
+
+  <p>
+    {detailedApplications.length} application{detailedApplications.length === 1
+      ? ""
+      : "s"}
+  </p>
 
   {#if detailedApplications.length === 0}
     <p>No applications yet.</p>
