@@ -112,7 +112,7 @@
   </button>
 
   <p>
-    {filteredJobs.length} job{`${filteredJobs.length === 1 ? "" : "s"}`} found
+    {filteredJobs.length} job{filteredJobs.length === 1 ? "" : "s"} found
   </p>
 
   <div class="header">
