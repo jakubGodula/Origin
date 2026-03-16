@@ -71,8 +71,19 @@
     </select>
   </div>
 
+  <button
+    class="button"
+    on:click={() => {
+      search = "";
+      selectedCompany = "";
+      selectedLocation = "";
+    }}
+  >
+    Reset filters
+  </button>
+
   <p>
-    {filteredJobs.length} job{`${filteredJobs.length !== 1 ? "s" : ""}`} found
+    {filteredJobs.length} job{`${filteredJobs.length === 1 ? "" : "s"}`} found
   </p>
 
   <div class="header">
@@ -114,8 +125,8 @@
   .filters {
     display: flex;
     gap: 12px;
-    margin-bottom: 20px;
     flex-wrap: wrap;
+    margin-bottom: 12px;
   }
 
   .filters input {
@@ -124,11 +135,5 @@
 
   .filters select {
     flex: 1;
-  }
-  .header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 16px;
   }
 </style>
