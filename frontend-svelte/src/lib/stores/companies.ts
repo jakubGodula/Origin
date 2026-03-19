@@ -12,6 +12,7 @@ export interface Company {
   name: string;
   description: string;
   branches: Branch[];
+  ownerId: string;
 }
 
 function createcompaniestore(): Writable<Company[]> {

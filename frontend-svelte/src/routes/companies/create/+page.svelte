@@ -2,11 +2,11 @@
   import { companies } from "$lib/stores/companies";
   import type { Company, Branch } from "$lib/stores/companies";
   import { goto } from "$app/navigation";
+  import { currentUser } from "$lib/stores/user";
 
   let name = "";
   let description = "";
   let error = "";
-
   let branches: Branch[] = [
     {
       id: crypto.randomUUID(),
@@ -66,11 +66,19 @@
       }
     }
 
+    const user = $currentUser;
+
+    if (!user) {
+      error = "You must be logged in.";
+      return;
+    }
+
     const newCompany: Company = {
       id: crypto.randomUUID(),
       name,
       description,
       branches,
+      ownerId: user.id,
     };
 
     companies.update((current) => [...current, newCompany]);

@@ -11,6 +11,7 @@
     { href: "/applications", label: "My Applications" },
     { href: "/companies", label: "Companies" },
     { href: "/hr", label: "HR Panel" },
+    { href: "/login", label: "Login" },
   ];
 </script>
 

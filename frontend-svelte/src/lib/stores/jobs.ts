@@ -4,9 +4,10 @@ export interface Job {
   id: number;
   title: string;
   salary: string;
-  description?: string;
+  description: string;
   companyId: string;
   branchId: string;
+  ownerId: string;
 }
 
 function createJobStore() {

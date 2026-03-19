@@ -1,11 +1,11 @@
 <script lang="ts">
   import { jobs } from "$lib/stores/jobs";
   import { companies } from "$lib/stores/companies";
+  import { currentUser } from "$lib/stores/user";
 
   let title = "";
   let salary = "";
   let description = "";
-
   let companyId = "";
   let branchId = "";
 
@@ -16,6 +16,10 @@
   function submitJob() {
     if (!title || !salary || !companyId || !branchId) return;
 
+    const user = $currentUser;
+
+    if (!user) return;
+
     const newJob = {
       id: Date.now(),
       title,
@@ -23,6 +27,7 @@
       description,
       companyId,
       branchId,
+      ownerId: user.id,
     };
 
     jobs.update((current) => [...current, newJob]);
@@ -90,7 +95,7 @@
       </select>
     {/if}
 
-    <button class="button" type="submit" style="margin-top:20px;">
+    <button class="button" type="submit" disabled={!$currentUser}>
       Post Job
     </button>
   </form>
